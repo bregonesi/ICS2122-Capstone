@@ -1,6 +1,7 @@
 import datetime
 import csv
 
+
 class City:
     def __init__(self, city):
         self.city = city
@@ -37,6 +38,7 @@ class City:
         if to_city not in self.flights:
             self.flights[to_city] = cost
 
+
 class Team:
     def __init__(self, code):
         self.name = None
@@ -55,6 +57,7 @@ class Team:
         self.city = city
         city.team = self
 
+
 class Channel:
     def __init__(self, name):
         self.name = name
@@ -65,6 +68,7 @@ class Channel:
             self.games.append(game)
             return True
         return False
+
 
 class Game:
     def __init__(self, home, away, date, day, channel):
@@ -80,6 +84,7 @@ class Game:
         self.channel = channel
         if self.channel:
             self.channel.add_game(self)
+
 
 class NBA:
     def __init__(self):
@@ -107,6 +112,7 @@ class NBA:
         for code in self.teams:
             if self.teams[code].name == name:
                 return Team(code)
+        return False
 
     def add_game(self, game):
         if game.date not in self.games:
@@ -184,8 +190,8 @@ class NBA:
                     to_city = self.teams[teams[idx1]].city
                     from_city.add_flight(to_city, cost)
 
-
-if __name__ == '__main__':
+'''
+if __name__ == "__main__":
     nba = NBA()
 
     print("Cargando seeds")
@@ -196,7 +202,8 @@ if __name__ == '__main__':
     print("Seeds terminado")
 
     for key in nba.teams:
-        print (key)
-    print ("-------------")
+        print(key)
+    print("-------------")
     for game in nba.games:
-        print (game)
+        print(game)
+'''
