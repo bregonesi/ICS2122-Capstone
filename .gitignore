@@ -2,7 +2,7 @@
 .DS_Store
 
 # Cache
-__pycache__
+__pycache__/
 
 # Nose que es esto
 .idea/
