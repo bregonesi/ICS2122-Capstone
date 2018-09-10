@@ -10,7 +10,7 @@ Cleveland Cavaliers,Toronto Raptors,10/17,2,X
 New Orleans Pelicans,Houston Rockets,10/17,2,ESPN
 Minnesota Timberwolves,San Antonio Spurs,10/17,2,X
 Utah Jazz,Sacramento Kings,10/17,2,X
-Denver Nuggets,LA Clippers,10/17,2,X
+Denver Nuggets,Los Angeles Clippers,10/17,2,X
 Dallas Mavericks,Phoenix Suns,10/17,2,ESPN
 Chicago Bulls,Philadelphia 76ers,10/18,3,TNT
 Miami Heat,Washington Wizards,10/18,3,X
@@ -23,7 +23,7 @@ Cleveland Cavaliers,Minnesota Timberwolves,10/19,4,X
 Sacramento Kings,New Orleans Pelicans,10/19,4,X
 Indiana Pacers,Milwaukee Bucks,10/19,4,X
 Golden State Warriors,Utah Jazz,10/19,4,ESPN
-Oklahoma City Thunder,LA Clippers,10/19,4,X
+Oklahoma City Thunder,Los Angeles Clippers,10/19,4,X
 Brooklyn Nets,Indiana Pacers,10/20,5,X
 Toronto Raptors,Washington Wizards,10/20,5,NBA TV
 Boston Celtics,New York Knicks,10/20,5,X
@@ -37,7 +37,7 @@ Houston Rockets,Los Angeles Lakers,10/20,5,ESPN
 Atlanta Hawks,Cleveland Cavaliers,10/21,6,X
 Sacramento Kings,Oklahoma City Thunder,10/21,6,X
 Golden State Warriors,Denver Nuggets,10/21,6,X
-Houston Rockets,LA Clippers,10/21,6,NBA TV
+Houston Rockets,Los Angeles Clippers,10/21,6,NBA TV
 Orlando Magic,Boston Celtics,10/22,7,NBA TV
 Charlotte Hornets,Toronto Raptors,10/22,7,X
 New York Knicks,Milwaukee Bucks,10/22,7,X
@@ -48,7 +48,7 @@ Washington Wizards,Portland Trail Blazers,10/22,7,X
 Phoenix Suns,Golden State Warriors,10/22,7,X
 San Antonio Spurs,Los Angeles Lakers,10/22,7,NBA TV
 Philadelphia 76ers,Detroit Pistons,10/23,8,NBA TV
-LA Clippers,New Orleans Pelicans,10/23,8,X
+Los Angeles Clippers,New Orleans Pelicans,10/23,8,X
 Sacramento Kings,Denver Nuggets,10/23,8,X
 Dallas Mavericks,Atlanta Hawks,10/24,9,ESPN
 Brooklyn Nets,Cleveland Cavaliers,10/24,9,X
@@ -68,7 +68,7 @@ Denver Nuggets,Los Angeles Lakers,10/25,10,TNT
 Chicago Bulls,Charlotte Hornets,10/26,11,X
 Golden State Warriors,New York Knicks,10/26,11,NBA TV
 Dallas Mavericks,Toronto Raptors,10/26,11,X
-LA Clippers,Houston Rockets,10/26,11,X
+Los Angeles Clippers,Houston Rockets,10/26,11,X
 Milwaukee Bucks,Minnesota Timberwolves,10/26,11,X
 Brooklyn Nets,New Orleans Pelicans,10/26,11,X
 Washington Wizards,Sacramento Kings,10/26,11,NBA TV
@@ -84,7 +84,7 @@ Los Angeles Lakers,San Antonio Spurs,10/27,12,X
 Golden State Warriors,Brooklyn Nets,10/28,13,X
 Utah Jazz,Dallas Mavericks,10/28,13,X
 Phoenix Suns,Oklahoma City Thunder,10/28,13,X
-Washington Wizards,LA Clippers,10/28,13,X
+Washington Wizards,Los Angeles Clippers,10/28,13,X
 Portland Trail Blazers,Indiana Pacers,10/29,14,X
 Atlanta Hawks,Philadelphia 76ers,10/29,14,X
 Sacramento Kings,Miami Heat,10/29,14,X
@@ -101,7 +101,7 @@ Detroit Pistons,Boston Celtics,10/30,15,X
 Philadelphia 76ers,Toronto Raptors,10/30,15,NBA TV
 Portland Trail Blazers,Houston Rockets,10/30,15,X
 Washington Wizards,Memphis Grizzlies,10/30,15,X
-LA Clippers,Oklahoma City Thunder,10/30,15,X
+Los Angeles Clippers,Oklahoma City Thunder,10/30,15,X
 Detroit Pistons,Brooklyn Nets,10/31,16,X
 Indiana Pacers,New York Knicks,10/31,16,ESPN
 Denver Nuggets,Chicago Bulls,10/31,16,X
@@ -111,11 +111,11 @@ Dallas Mavericks,Los Angeles Lakers,10/31,16,X
 San Antonio Spurs,Phoenix Suns,10/31,16,ESPN
 Oklahoma City Thunder,Charlotte Hornets,11/1,17,X
 Denver Nuggets,Cleveland Cavaliers,11/1,17,X
-LA Clippers,Philadelphia 76ers,11/1,17,X
+Los Angeles Clippers,Philadelphia 76ers,11/1,17,X
 Sacramento Kings,Atlanta Hawks,11/1,17,X
 Milwaukee Bucks,Boston Celtics,11/1,17,TNT
 New Orleans Pelicans,Portland Trail Blazers,11/1,17,TNT
-LA Clippers,Orlando Magic,11/2,18,X
+Los Angeles Clippers,Orlando Magic,11/2,18,X
 Houston Rockets,Brooklyn Nets,11/2,18,X
 Oklahoma City Thunder,Washington Wizards,11/2,18,ESPN
 Indiana Pacers,Chicago Bulls,11/2,18,X
@@ -146,7 +146,7 @@ New Orleans Pelicans,Oklahoma City Thunder,11/5,21,NBA TV
 Boston Celtics,Denver Nuggets,11/5,21,X
 Toronto Raptors,Utah Jazz,11/5,21,X
 Memphis Grizzlies,Golden State Warriors,11/5,21,NBA TV
-Minnesota Timberwolves,LA Clippers,11/5,21,X
+Minnesota Timberwolves,Los Angeles Clippers,11/5,21,X
 Atlanta Hawks,Charlotte Hornets,11/6,22,X
 Washington Wizards,Dallas Mavericks,11/6,22,NBA TV
 Brooklyn Nets,Phoenix Suns,11/6,22,X
@@ -163,7 +163,7 @@ Toronto Raptors,Sacramento Kings,11/7,23,X
 Minnesota Timberwolves,Los Angeles Lakers,11/7,23,ESPN
 Houston Rockets,Oklahoma City Thunder,11/8,24,TNT
 Boston Celtics,Phoenix Suns,11/8,24,X
-LA Clippers,Portland Trail Blazers,11/8,24,X
+Los Angeles Clippers,Portland Trail Blazers,11/8,24,X
 Milwaukee Bucks,Golden State Warriors,11/8,24,TNT
 Washington Wizards,Orlando Magic,11/9,25,X
 Charlotte Hornets,Philadelphia 76ers,11/9,25,NBA TV
@@ -173,7 +173,7 @@ Brooklyn Nets,Denver Nuggets,11/9,25,X
 Boston Celtics,Utah Jazz,11/9,25,ESPN
 Minnesota Timberwolves,Sacramento Kings,11/9,25,X
 New York Knicks,Toronto Raptors,11/10,26,X
-Milwaukee Bucks,LA Clippers,11/10,26,X
+Milwaukee Bucks,Los Angeles Clippers,11/10,26,X
 Phoenix Suns,New Orleans Pelicans,11/10,26,X
 Washington Wizards,Miami Heat,11/10,26,X
 Cleveland Cavaliers,Chicago Bulls,11/10,26,X
@@ -196,7 +196,7 @@ Utah Jazz,Memphis Grizzlies,11/12,28,X
 Brooklyn Nets,Minnesota Timberwolves,11/12,28,X
 Phoenix Suns,Oklahoma City Thunder,11/12,28,X
 San Antonio Spurs,Sacramento Kings,11/12,28,X
-Golden State Warriors,LA Clippers,11/12,28,NBA TV
+Golden State Warriors,Los Angeles Clippers,11/12,28,NBA TV
 Charlotte Hornets,Cleveland Cavaliers,11/13,29,NBA TV
 Houston Rockets,Denver Nuggets,11/13,29,X
 Atlanta Hawks,Golden State Warriors,11/13,29,NBA TV
@@ -213,7 +213,7 @@ San Antonio Spurs,Phoenix Suns,11/14,30,X
 Portland Trail Blazers,Los Angeles Lakers,11/14,30,ESPN
 Golden State Warriors,Houston Rockets,11/15,31,TNT
 Atlanta Hawks,Denver Nuggets,11/15,31,X
-San Antonio Spurs,LA Clippers,11/15,31,TNT
+San Antonio Spurs,Los Angeles Clippers,11/15,31,TNT
 Toronto Raptors,Boston Celtics,11/16,32,ESPN
 Miami Heat,Indiana Pacers,11/16,32,X
 Utah Jazz,Philadelphia 76ers,11/16,32,X
@@ -222,7 +222,7 @@ Sacramento Kings,Memphis Grizzlies,11/16,32,X
 Portland Trail Blazers,Minnesota Timberwolves,11/16,32,X
 New York Knicks,New Orleans Pelicans,11/16,32,X
 Chicago Bulls,Milwaukee Bucks,11/16,32,ESPN
-LA Clippers,Brooklyn Nets,11/17,33,X
+Los Angeles Clippers,Brooklyn Nets,11/17,33,X
 Philadelphia 76ers,Charlotte Hornets,11/17,33,X
 Atlanta Hawks,Indiana Pacers,11/17,33,X
 Los Angeles Lakers,Orlando Magic,11/17,33,X
@@ -241,13 +241,13 @@ Boston Celtics,Charlotte Hornets,11/19,35,X
 Cleveland Cavaliers,Detroit Pistons,11/19,35,X
 Utah Jazz,Indiana Pacers,11/19,35,X
 Phoenix Suns,Philadelphia 76ers,11/19,35,NBA TV
-LA Clippers,Atlanta Hawks,11/19,35,X
+Los Angeles Clippers,Atlanta Hawks,11/19,35,X
 Dallas Mavericks,Memphis Grizzlies,11/19,35,X
 Denver Nuggets,Milwaukee Bucks,11/19,35,X
 San Antonio Spurs,New Orleans Pelicans,11/19,35,X
 Oklahoma City Thunder,Sacramento Kings,11/19,35,NBA TV
 Toronto Raptors,Orlando Magic,11/20,36,X
-LA Clippers,Washington Wizards,11/20,36,X
+Los Angeles Clippers,Washington Wizards,11/20,36,X
 Brooklyn Nets,Miami Heat,11/20,36,X
 Portland Trail Blazers,New York Knicks,11/20,36,NBA TV
 Indiana Pacers,Charlotte Hornets,11/21,37,X
@@ -264,7 +264,7 @@ Memphis Grizzlies,San Antonio Spurs,11/21,37,X
 Sacramento Kings,Utah Jazz,11/21,37,X
 Oklahoma City Thunder,Golden State Warriors,11/21,37,ESPN
 Minnesota Timberwolves,Brooklyn Nets,11/23,39,X
-Memphis Grizzlies,LA Clippers,11/23,39,X
+Memphis Grizzlies,Los Angeles Clippers,11/23,39,X
 Houston Rockets,Detroit Pistons,11/23,39,NBA TV
 Boston Celtics,Atlanta Hawks,11/23,39,X
 New Orleans Pelicans,New York Knicks,11/23,39,X
@@ -291,7 +291,7 @@ Philadelphia 76ers,Brooklyn Nets,11/25,41,X
 Miami Heat,Toronto Raptors,11/25,41,X
 New York Knicks,Memphis Grizzlies,11/25,41,X
 Utah Jazz,Sacramento Kings,11/25,41,X
-LA Clippers,Portland Trail Blazers,11/25,41,X
+Los Angeles Clippers,Portland Trail Blazers,11/25,41,X
 Milwaukee Bucks,Charlotte Hornets,11/26,42,X
 Minnesota Timberwolves,Cleveland Cavaliers,11/26,42,X
 Houston Rockets,Washington Wizards,11/26,42,NBA TV
@@ -313,10 +313,10 @@ San Antonio Spurs,Minnesota Timberwolves,11/28,44,X
 Washington Wizards,New Orleans Pelicans,11/28,44,X
 Cleveland Cavaliers,Oklahoma City Thunder,11/28,44,X
 Orlando Magic,Portland Trail Blazers,11/28,44,NBA TV
-Phoenix Suns,LA Clippers,11/28,44,X
+Phoenix Suns,Los Angeles Clippers,11/28,44,X
 Golden State Warriors,Toronto Raptors,11/29,45,TNT
 Indiana Pacers,Los Angeles Lakers,11/29,45,X
-LA Clippers,Sacramento Kings,11/29,45,TNT
+Los Angeles Clippers,Sacramento Kings,11/29,45,TNT
 Cleveland Cavaliers,Boston Celtics,11/30,46,X
 Utah Jazz,Charlotte Hornets,11/30,46,X
 Chicago Bulls,Detroit Pistons,11/30,46,X
@@ -339,7 +339,7 @@ Phoenix Suns,Los Angeles Lakers,12/2,48,X
 New Orleans Pelicans,Charlotte Hornets,12/2,48,X
 Utah Jazz,Miami Heat,12/2,48,X
 Memphis Grizzlies,Philadelphia 76ers,12/2,48,X
-LA Clippers,Dallas Mavericks,12/2,48,X
+Los Angeles Clippers,Dallas Mavericks,12/2,48,X
 Portland Trail Blazers,San Antonio Spurs,12/2,48,X
 Oklahoma City Thunder,Detroit Pistons,12/3,49,NBA TV
 Golden State Warriors,Atlanta Hawks,12/3,49,X
@@ -347,7 +347,7 @@ Cleveland Cavaliers,Brooklyn Nets,12/3,49,X
 Washington Wizards,New York Knicks,12/3,49,X
 Denver Nuggets,Toronto Raptors,12/3,49,X
 Houston Rockets,Minnesota Timberwolves,12/3,49,X
-LA Clippers,New Orleans Pelicans,12/3,49,X
+Los Angeles Clippers,New Orleans Pelicans,12/3,49,X
 Chicago Bulls,Indiana Pacers,12/4,50,X
 Orlando Magic,Miami Heat,12/4,50,X
 Portland Trail Blazers,Dallas Mavericks,12/4,50,X
@@ -358,7 +358,7 @@ Denver Nuggets,Orlando Magic,12/5,51,X
 Washington Wizards,Atlanta Hawks,12/5,51,X
 Oklahoma City Thunder,Brooklyn Nets,12/5,51,X
 Philadelphia 76ers,Toronto Raptors,12/5,51,ESPN
-LA Clippers,Memphis Grizzlies,12/5,51,X
+Los Angeles Clippers,Memphis Grizzlies,12/5,51,X
 Detroit Pistons,Milwaukee Bucks,12/5,51,X
 Charlotte Hornets,Minnesota Timberwolves,12/5,51,X
 Dallas Mavericks,New Orleans Pelicans,12/5,51,X
@@ -384,7 +384,7 @@ Brooklyn Nets,New York Knicks,12/8,54,X
 Boston Celtics,Chicago Bulls,12/8,54,X
 Los Angeles Lakers,Memphis Grizzlies,12/8,54,X
 Minnesota Timberwolves,Portland Trail Blazers,12/8,54,X
-Miami Heat,LA Clippers,12/8,54,X
+Miami Heat,Los Angeles Clippers,12/8,54,X
 New Orleans Pelicans,Detroit Pistons,12/9,55,X
 Milwaukee Bucks,Toronto Raptors,12/9,55,NBA TV
 Utah Jazz,San Antonio Spurs,12/9,55,X
@@ -397,12 +397,12 @@ Cleveland Cavaliers,Milwaukee Bucks,12/10,56,X
 Utah Jazz,Oklahoma City Thunder,12/10,56,X
 Orlando Magic,Dallas Mavericks,12/10,56,X
 Memphis Grizzlies,Denver Nuggets,12/10,56,X
-LA Clippers,Phoenix Suns,12/10,56,X
+Los Angeles Clippers,Phoenix Suns,12/10,56,X
 Minnesota Timberwolves,Golden State Warriors,12/10,56,X
 Miami Heat,Los Angeles Lakers,12/10,56,NBA TV
 Portland Trail Blazers,Houston Rockets,12/11,57,NBA TV
 Phoenix Suns,San Antonio Spurs,12/11,57,X
-Toronto Raptors,LA Clippers,12/11,57,NBA TV
+Toronto Raptors,Los Angeles Clippers,12/11,57,NBA TV
 Detroit Pistons,Charlotte Hornets,12/12,58,X
 New York Knicks,Cleveland Cavaliers,12/12,58,X
 Milwaukee Bucks,Indiana Pacers,12/12,58,X
@@ -415,7 +415,7 @@ Miami Heat,Utah Jazz,12/12,58,X
 Minnesota Timberwolves,Sacramento Kings,12/12,58,X
 Toronto Raptors,Golden State Warriors,12/12,58,ESPN
 Los Angeles Lakers,Houston Rockets,12/13,59,TNT
-LA Clippers,San Antonio Spurs,12/13,59,X
+Los Angeles Clippers,San Antonio Spurs,12/13,59,X
 Chicago Bulls,Orlando Magic,12/13,59,X
 Dallas Mavericks,Phoenix Suns,12/13,59,TNT
 Atlanta Hawks,Boston Celtics,12/14,60,X
@@ -432,7 +432,7 @@ Los Angeles Lakers,Charlotte Hornets,12/15,61,X
 Boston Celtics,Detroit Pistons,12/15,61,X
 Houston Rockets,Memphis Grizzlies,12/15,61,X
 Chicago Bulls,San Antonio Spurs,12/15,61,X
-LA Clippers,Oklahoma City Thunder,12/15,61,X
+Los Angeles Clippers,Oklahoma City Thunder,12/15,61,X
 Minnesota Timberwolves,Phoenix Suns,12/15,61,X
 Atlanta Hawks,Brooklyn Nets,12/16,62,X
 Philadelphia 76ers,Cleveland Cavaliers,12/16,62,X
@@ -448,7 +448,7 @@ Sacramento Kings,Minnesota Timberwolves,12/17,63,X
 Chicago Bulls,Oklahoma City Thunder,12/17,63,X
 Philadelphia 76ers,San Antonio Spurs,12/17,63,X
 Memphis Grizzlies,Golden State Warriors,12/17,63,NBA TV
-Portland Trail Blazers,LA Clippers,12/17,63,X
+Portland Trail Blazers,Los Angeles Clippers,12/17,63,X
 Cleveland Cavaliers,Indiana Pacers,12/18,64,X
 Washington Wizards,Atlanta Hawks,12/18,64,X
 Los Angeles Lakers,Brooklyn Nets,12/18,64,NBA TV
@@ -466,7 +466,7 @@ Golden State Warriors,Utah Jazz,12/19,65,X
 Memphis Grizzlies,Portland Trail Blazers,12/19,65,X
 Oklahoma City Thunder,Sacramento Kings,12/19,65,NBA TV
 Houston Rockets,Miami Heat,12/20,66,TNT
-Dallas Mavericks,LA Clippers,12/20,66,TNT
+Dallas Mavericks,Los Angeles Clippers,12/20,66,TNT
 Detroit Pistons,Charlotte Hornets,12/21,67,X
 Cleveland Cavaliers,Toronto Raptors,12/21,67,X
 Indiana Pacers,Brooklyn Nets,12/21,67,X
@@ -477,7 +477,7 @@ Minnesota Timberwolves,San Antonio Spurs,12/21,67,X
 Utah Jazz,Portland Trail Blazers,12/21,67,X
 Memphis Grizzlies,Sacramento Kings,12/21,67,X
 New Orleans Pelicans,Los Angeles Lakers,12/21,67,ESPN
-Denver Nuggets,LA Clippers,12/22,68,X
+Denver Nuggets,Los Angeles Clippers,12/22,68,X
 Phoenix Suns,Washington Wizards,12/22,68,X
 Toronto Raptors,Philadelphia 76ers,12/22,68,NBA TV
 Milwaukee Bucks,Miami Heat,12/22,68,X
@@ -492,7 +492,7 @@ Chicago Bulls,Cleveland Cavaliers,12/23,69,X
 Miami Heat,Orlando Magic,12/23,69,X
 New Orleans Pelicans,Sacramento Kings,12/23,69,X
 Minnesota Timberwolves,Oklahoma City Thunder,12/23,69,X
-LA Clippers,Golden State Warriors,12/23,69,X
+Los Angeles Clippers,Golden State Warriors,12/23,69,X
 Dallas Mavericks,Portland Trail Blazers,12/23,69,X
 Memphis Grizzlies,Los Angeles Lakers,12/23,69,X
 Milwaukee Bucks,New York Knicks,12/25,71,ESPN
@@ -509,7 +509,7 @@ Minnesota Timberwolves,Chicago Bulls,12/26,72,X
 Cleveland Cavaliers,Memphis Grizzlies,12/26,72,X
 New Orleans Pelicans,Dallas Mavericks,12/26,72,X
 Denver Nuggets,San Antonio Spurs,12/26,72,X
-Sacramento Kings,LA Clippers,12/26,72,X
+Sacramento Kings,Los Angeles Clippers,12/26,72,X
 Boston Celtics,Houston Rockets,12/27,73,TNT
 New York Knicks,Milwaukee Bucks,12/27,73,X
 Los Angeles Lakers,Sacramento Kings,12/27,73,X
@@ -524,7 +524,7 @@ Atlanta Hawks,Minnesota Timberwolves,12/28,74,X
 Dallas Mavericks,New Orleans Pelicans,12/28,74,NBA TV
 San Antonio Spurs,Denver Nuggets,12/28,74,X
 Oklahoma City Thunder,Phoenix Suns,12/28,74,X
-LA Clippers,Los Angeles Lakers,12/28,74,NBA TV
+Los Angeles Clippers,Los Angeles Lakers,12/28,74,NBA TV
 Brooklyn Nets,Milwaukee Bucks,12/29,75,X
 Houston Rockets,New Orleans Pelicans,12/29,75,NBA TV
 Charlotte Hornets,Washington Wizards,12/29,75,X
@@ -533,7 +533,7 @@ Boston Celtics,Memphis Grizzlies,12/29,75,X
 New York Knicks,Utah Jazz,12/29,75,X
 Denver Nuggets,Phoenix Suns,12/29,75,X
 Golden State Warriors,Portland Trail Blazers,12/29,75,NBA TV
-San Antonio Spurs,LA Clippers,12/29,75,X
+San Antonio Spurs,Los Angeles Clippers,12/29,75,X
 Detroit Pistons,Orlando Magic,12/30,76,X
 Minnesota Timberwolves,Miami Heat,12/30,76,X
 Chicago Bulls,Toronto Raptors,12/30,76,X
@@ -551,7 +551,7 @@ Utah Jazz,Toronto Raptors,1/1,78,NBA TV
 Detroit Pistons,Milwaukee Bucks,1/1,78,X
 New York Knicks,Denver Nuggets,1/1,78,X
 Portland Trail Blazers,Sacramento Kings,1/1,78,X
-Philadelphia 76ers,LA Clippers,1/1,78,X
+Philadelphia 76ers,Los Angeles Clippers,1/1,78,X
 Dallas Mavericks,Charlotte Hornets,1/2,79,X
 Miami Heat,Cleveland Cavaliers,1/2,79,X
 Atlanta Hawks,Washington Wizards,1/2,79,X
@@ -571,7 +571,7 @@ Indiana Pacers,Chicago Bulls,1/4,81,X
 Brooklyn Nets,Memphis Grizzlies,1/4,81,X
 Orlando Magic,Minnesota Timberwolves,1/4,81,X
 Atlanta Hawks,Milwaukee Bucks,1/4,81,X
-LA Clippers,Phoenix Suns,1/4,81,X
+Los Angeles Clippers,Phoenix Suns,1/4,81,X
 New York Knicks,Los Angeles Lakers,1/4,81,X
 Oklahoma City Thunder,Portland Trail Blazers,1/4,81,ESPN
 Charlotte Hornets,Denver Nuggets,1/5,82,X
@@ -584,7 +584,7 @@ Houston Rockets,Portland Trail Blazers,1/5,82,X
 Golden State Warriors,Sacramento Kings,1/5,82,X
 Brooklyn Nets,Chicago Bulls,1/6,83,X
 Los Angeles Lakers,Minnesota Timberwolves,1/6,83,X
-Orlando Magic,LA Clippers,1/6,83,X
+Orlando Magic,Los Angeles Clippers,1/6,83,X
 Miami Heat,Atlanta Hawks,1/6,83,X
 Washington Wizards,Oklahoma City Thunder,1/6,83,X
 Indiana Pacers,Toronto Raptors,1/6,83,NBA TV
@@ -604,7 +604,7 @@ Atlanta Hawks,Toronto Raptors,1/8,85,X
 Minnesota Timberwolves,Oklahoma City Thunder,1/8,85,NBA TV
 Sacramento Kings,Phoenix Suns,1/8,85,X
 New York Knicks,Golden State Warriors,1/8,85,NBA TV
-Charlotte Hornets,LA Clippers,1/8,85,X
+Charlotte Hornets,Los Angeles Clippers,1/8,85,X
 Indiana Pacers,Boston Celtics,1/9,86,X
 Philadelphia 76ers,Washington Wizards,1/9,86,X
 Atlanta Hawks,Brooklyn Nets,1/9,86,X
@@ -616,7 +616,7 @@ Orlando Magic,Utah Jazz,1/9,86,X
 Chicago Bulls,Portland Trail Blazers,1/9,86,X
 Detroit Pistons,Los Angeles Lakers,1/9,86,ESPN
 Boston Celtics,Miami Heat,1/10,87,TNT
-LA Clippers,Denver Nuggets,1/10,87,X
+Los Angeles Clippers,Denver Nuggets,1/10,87,X
 Oklahoma City Thunder,San Antonio Spurs,1/10,87,TNT
 Detroit Pistons,Sacramento Kings,1/10,87,X
 Atlanta Hawks,Philadelphia 76ers,1/11,88,X
@@ -628,7 +628,7 @@ Dallas Mavericks,Minnesota Timberwolves,1/11,88,X
 Los Angeles Lakers,Utah Jazz,1/11,88,ESPN
 Charlotte Hornets,Portland Trail Blazers,1/11,88,X
 Chicago Bulls,Golden State Warriors,1/11,88,X
-Detroit Pistons,LA Clippers,1/12,89,X
+Detroit Pistons,Los Angeles Clippers,1/12,89,X
 Memphis Grizzlies,Miami Heat,1/12,89,X
 Boston Celtics,Orlando Magic,1/12,89,X
 New Orleans Pelicans,Minnesota Timberwolves,1/12,89,X
@@ -648,7 +648,7 @@ Memphis Grizzlies,Houston Rockets,1/14,91,X
 Charlotte Hornets,San Antonio Spurs,1/14,91,NBA TV
 Detroit Pistons,Utah Jazz,1/14,91,X
 Portland Trail Blazers,Sacramento Kings,1/14,91,X
-New Orleans Pelicans,LA Clippers,1/14,91,X
+New Orleans Pelicans,Los Angeles Clippers,1/14,91,X
 Phoenix Suns,Indiana Pacers,1/15,92,X
 Minnesota Timberwolves,Philadelphia 76ers,1/15,92,NBA TV
 Oklahoma City Thunder,Atlanta Hawks,1/15,92,X
@@ -662,7 +662,7 @@ Milwaukee Bucks,Memphis Grizzlies,1/16,93,X
 San Antonio Spurs,Dallas Mavericks,1/16,93,X
 Cleveland Cavaliers,Portland Trail Blazers,1/16,93,X
 New Orleans Pelicans,Golden State Warriors,1/16,93,ESPN
-Utah Jazz,LA Clippers,1/16,93,X
+Utah Jazz,Los Angeles Clippers,1/16,93,X
 New York Knicks,Washington Wizards,1/17,94,NBA TV
 Sacramento Kings,Charlotte Hornets,1/17,94,X
 Philadelphia 76ers,Indiana Pacers,1/17,94,TNT
@@ -674,7 +674,7 @@ Miami Heat,Detroit Pistons,1/18,95,X
 Brooklyn Nets,Orlando Magic,1/18,95,X
 San Antonio Spurs,Minnesota Timberwolves,1/18,95,ESPN
 Cleveland Cavaliers,Utah Jazz,1/18,95,X
-Golden State Warriors,LA Clippers,1/18,95,X
+Golden State Warriors,Los Angeles Clippers,1/18,95,X
 New Orleans Pelicans,Portland Trail Blazers,1/18,95,ESPN
 Oklahoma City Thunder,Philadelphia 76ers,1/19,96,ABC
 Phoenix Suns,Charlotte Hornets,1/19,96,X
@@ -688,7 +688,7 @@ Los Angeles Lakers,Houston Rockets,1/19,96,ABC
 Cleveland Cavaliers,Denver Nuggets,1/19,96,X
 Charlotte Hornets,Indiana Pacers,1/20,97,X
 Phoenix Suns,Minnesota Timberwolves,1/20,97,X
-LA Clippers,San Antonio Spurs,1/20,97,X
+Los Angeles Clippers,San Antonio Spurs,1/20,97,X
 Oklahoma City Thunder,New York Knicks,1/21,98,NBA TV
 Chicago Bulls,Cleveland Cavaliers,1/21,98,X
 Detroit Pistons,Washington Wizards,1/21,98,X
@@ -702,12 +702,12 @@ Portland Trail Blazers,Utah Jazz,1/21,98,X
 Golden State Warriors,Los Angeles Lakers,1/21,98,TNT
 Sacramento Kings,Toronto Raptors,1/22,99,X
 Portland Trail Blazers,Oklahoma City Thunder,1/22,99,NBA TV
-LA Clippers,Dallas Mavericks,1/22,99,X
+Los Angeles Clippers,Dallas Mavericks,1/22,99,X
 Minnesota Timberwolves,Phoenix Suns,1/22,99,X
 Toronto Raptors,Indiana Pacers,1/23,100,X
 Cleveland Cavaliers,Boston Celtics,1/23,100,X
 Orlando Magic,Brooklyn Nets,1/23,100,X
-LA Clippers,Miami Heat,1/23,100,X
+Los Angeles Clippers,Miami Heat,1/23,100,X
 Houston Rockets,New York Knicks,1/23,100,X
 San Antonio Spurs,Philadelphia 76ers,1/23,100,ESPN
 Atlanta Hawks,Chicago Bulls,1/23,100,X
@@ -721,7 +721,7 @@ Minnesota Timberwolves,Los Angeles Lakers,1/24,101,TNT
 Washington Wizards,Orlando Magic,1/25,102,X
 New York Knicks,Brooklyn Nets,1/25,102,X
 Miami Heat,Cleveland Cavaliers,1/25,102,X
-LA Clippers,Chicago Bulls,1/25,102,X
+Los Angeles Clippers,Chicago Bulls,1/25,102,X
 Toronto Raptors,Houston Rockets,1/25,102,ESPN
 Sacramento Kings,Memphis Grizzlies,1/25,102,X
 Detroit Pistons,Dallas Mavericks,1/25,102,X
@@ -734,7 +734,7 @@ Golden State Warriors,Boston Celtics,1/26,103,ABC
 Philadelphia 76ers,Denver Nuggets,1/26,103,X
 Atlanta Hawks,Portland Trail Blazers,1/26,103,X
 Cleveland Cavaliers,Chicago Bulls,1/27,104,X
-Sacramento Kings,LA Clippers,1/27,104,X
+Sacramento Kings,Los Angeles Clippers,1/27,104,X
 Milwaukee Bucks,Oklahoma City Thunder,1/27,104,ESPN
 Orlando Magic,Houston Rockets,1/27,104,X
 Toronto Raptors,Dallas Mavericks,1/27,104,X
@@ -746,7 +746,7 @@ New York Knicks,Charlotte Hornets,1/28,105,X
 Golden State Warriors,Indiana Pacers,1/28,105,NBA TV
 Brooklyn Nets,Boston Celtics,1/28,105,X
 Denver Nuggets,Memphis Grizzlies,1/28,105,X
-Atlanta Hawks,LA Clippers,1/28,105,NBA TV
+Atlanta Hawks,Los Angeles Clippers,1/28,105,NBA TV
 Washington Wizards,Cleveland Cavaliers,1/29,106,X
 Milwaukee Bucks,Detroit Pistons,1/29,106,X
 Oklahoma City Thunder,Orlando Magic,1/29,106,X
@@ -767,13 +767,13 @@ Indiana Pacers,Orlando Magic,1/31,108,X
 Milwaukee Bucks,Toronto Raptors,1/31,108,TNT
 Brooklyn Nets,San Antonio Spurs,1/31,108,X
 Philadelphia 76ers,Golden State Warriors,1/31,108,TNT
-Los Angeles Lakers,LA Clippers,1/31,108,X
+Los Angeles Lakers,Los Angeles Clippers,1/31,108,X
 Memphis Grizzlies,Charlotte Hornets,2/1,109,X
 Boston Celtics,New York Knicks,2/1,109,ESPN
 Oklahoma City Thunder,Miami Heat,2/1,109,X
 Atlanta Hawks,Utah Jazz,2/1,109,X
 Houston Rockets,Denver Nuggets,2/1,109,ESPN
-LA Clippers,Detroit Pistons,2/2,110,X
+Los Angeles Clippers,Detroit Pistons,2/2,110,X
 Chicago Bulls,Charlotte Hornets,2/2,110,X
 Brooklyn Nets,Orlando Magic,2/2,110,X
 Milwaukee Bucks,Washington Wizards,2/2,110,X
@@ -787,14 +787,14 @@ Houston Rockets,Utah Jazz,2/2,110,X
 Philadelphia 76ers,Sacramento Kings,2/2,110,X
 Memphis Grizzlies,New York Knicks,2/3,111,X
 Oklahoma City Thunder,Boston Celtics,2/3,111,ABC
-LA Clippers,Toronto Raptors,2/3,111,X
+Los Angeles Clippers,Toronto Raptors,2/3,111,X
 Denver Nuggets,Detroit Pistons,2/4,112,X
 Atlanta Hawks,Washington Wizards,2/4,112,X
 Milwaukee Bucks,Brooklyn Nets,2/4,112,NBA TV
 Indiana Pacers,New Orleans Pelicans,2/4,112,X
 Houston Rockets,Phoenix Suns,2/4,112,X
 San Antonio Spurs,Sacramento Kings,2/4,112,NBA TV
-LA Clippers,Charlotte Hornets,2/5,113,X
+Los Angeles Clippers,Charlotte Hornets,2/5,113,X
 Boston Celtics,Cleveland Cavaliers,2/5,113,X
 Los Angeles Lakers,Indiana Pacers,2/5,113,X
 Detroit Pistons,New York Knicks,2/5,113,X
@@ -809,7 +809,7 @@ Charlotte Hornets,Dallas Mavericks,2/6,114,X
 Phoenix Suns,Utah Jazz,2/6,114,X
 Houston Rockets,Sacramento Kings,2/6,114,X
 San Antonio Spurs,Golden State Warriors,2/6,114,ESPN
-LA Clippers,Indiana Pacers,2/7,115,X
+Los Angeles Clippers,Indiana Pacers,2/7,115,X
 Minnesota Timberwolves,Orlando Magic,2/7,115,X
 Toronto Raptors,Atlanta Hawks,2/7,115,X
 Los Angeles Lakers,Boston Celtics,2/7,115,TNT
@@ -827,7 +827,7 @@ San Antonio Spurs,Utah Jazz,2/9,117,X
 Cleveland Cavaliers,Indiana Pacers,2/9,117,X
 Charlotte Hornets,Atlanta Hawks,2/9,117,X
 Toronto Raptors,New York Knicks,2/9,117,X
-LA Clippers,Boston Celtics,2/9,117,X
+Los Angeles Clippers,Boston Celtics,2/9,117,X
 Washington Wizards,Chicago Bulls,2/9,117,X
 New Orleans Pelicans,Memphis Grizzlies,2/9,117,X
 Oklahoma City Thunder,Houston Rockets,2/9,117,ABC
@@ -843,7 +843,7 @@ Charlotte Hornets,Indiana Pacers,2/11,119,X
 Brooklyn Nets,Toronto Raptors,2/11,119,X
 Milwaukee Bucks,Chicago Bulls,2/11,119,X
 Dallas Mavericks,Houston Rockets,2/11,119,X
-LA Clippers,Minnesota Timberwolves,2/11,119,X
+Los Angeles Clippers,Minnesota Timberwolves,2/11,119,X
 Portland Trail Blazers,Oklahoma City Thunder,2/11,119,X
 Miami Heat,Denver Nuggets,2/11,119,X
 Los Angeles Lakers,Atlanta Hawks,2/12,120,X
@@ -861,7 +861,7 @@ Miami Heat,Dallas Mavericks,2/13,121,X
 Sacramento Kings,Denver Nuggets,2/13,121,X
 Houston Rockets,Minnesota Timberwolves,2/13,121,ESPN
 Golden State Warriors,Portland Trail Blazers,2/13,121,X
-Phoenix Suns,LA Clippers,2/13,121,X
+Phoenix Suns,Los Angeles Clippers,2/13,121,X
 Charlotte Hornets,Orlando Magic,2/14,122,X
 New York Knicks,Atlanta Hawks,2/14,122,X
 Oklahoma City Thunder,New Orleans Pelicans,2/14,122,TNT
@@ -877,7 +877,7 @@ Chicago Bulls,Orlando Magic,2/22,130,X
 San Antonio Spurs,Toronto Raptors,2/22,130,ESPN
 Detroit Pistons,Atlanta Hawks,2/22,130,X
 Minnesota Timberwolves,New York Knicks,2/22,130,X
-LA Clippers,Memphis Grizzlies,2/22,130,X
+Los Angeles Clippers,Memphis Grizzlies,2/22,130,X
 Denver Nuggets,Dallas Mavericks,2/22,130,X
 Utah Jazz,Oklahoma City Thunder,2/22,130,ESPN
 Portland Trail Blazers,Philadelphia 76ers,2/23,131,X
@@ -893,7 +893,7 @@ Minnesota Timberwolves,Milwaukee Bucks,2/23,131,X
 Houston Rockets,Golden State Warriors,2/23,131,ABC
 Dallas Mavericks,Utah Jazz,2/23,131,X
 Orlando Magic,Toronto Raptors,2/24,132,X
-LA Clippers,Denver Nuggets,2/24,132,X
+Los Angeles Clippers,Denver Nuggets,2/24,132,X
 San Antonio Spurs,New York Knicks,2/24,132,NBA TV
 Golden State Warriors,Charlotte Hornets,2/25,133,X
 Portland Trail Blazers,Cleveland Cavaliers,2/25,133,X
@@ -905,7 +905,7 @@ Atlanta Hawks,Houston Rockets,2/25,133,X
 Los Angeles Lakers,Memphis Grizzlies,2/25,133,X
 Sacramento Kings,Minnesota Timberwolves,2/25,133,X
 Philadelphia 76ers,New Orleans Pelicans,2/25,133,NBA TV
-Dallas Mavericks,LA Clippers,2/25,133,NBA TV
+Dallas Mavericks,Los Angeles Clippers,2/25,133,NBA TV
 Orlando Magic,New York Knicks,2/26,134,X
 Boston Celtics,Toronto Raptors,2/26,134,TNT
 Oklahoma City Thunder,Denver Nuggets,2/26,134,TNT
@@ -917,7 +917,7 @@ Golden State Warriors,Miami Heat,2/27,135,X
 Chicago Bulls,Memphis Grizzlies,2/27,135,X
 Detroit Pistons,San Antonio Spurs,2/27,135,ESPN
 Indiana Pacers,Dallas Mavericks,2/27,135,X
-LA Clippers,Utah Jazz,2/27,135,X
+Los Angeles Clippers,Utah Jazz,2/27,135,X
 Milwaukee Bucks,Sacramento Kings,2/27,135,X
 New Orleans Pelicans,Los Angeles Lakers,2/27,135,ESPN
 Minnesota Timberwolves,Indiana Pacers,2/28,136,TNT
@@ -931,7 +931,7 @@ Charlotte Hornets,Brooklyn Nets,3/1,137,X
 Portland Trail Blazers,Toronto Raptors,3/1,137,X
 Washington Wizards,Boston Celtics,3/1,137,ESPN
 New Orleans Pelicans,Phoenix Suns,3/1,137,X
-LA Clippers,Sacramento Kings,3/1,137,X
+Los Angeles Clippers,Sacramento Kings,3/1,137,X
 Milwaukee Bucks,Los Angeles Lakers,3/1,137,ESPN
 Detroit Pistons,Cleveland Cavaliers,3/2,138,X
 Orlando Magic,Indiana Pacers,3/2,138,X
@@ -945,7 +945,7 @@ Milwaukee Bucks,Utah Jazz,3/2,138,X
 Portland Trail Blazers,Charlotte Hornets,3/3,139,X
 Houston Rockets,Boston Celtics,3/3,139,ABC
 Atlanta Hawks,Chicago Bulls,3/3,139,X
-New York Knicks,LA Clippers,3/3,139,X
+New York Knicks,Los Angeles Clippers,3/3,139,X
 Orlando Magic,Cleveland Cavaliers,3/3,139,X
 Toronto Raptors,Detroit Pistons,3/3,139,X
 Minnesota Timberwolves,Washington Wizards,3/3,139,X
@@ -956,7 +956,7 @@ Denver Nuggets,San Antonio Spurs,3/4,140,X
 Milwaukee Bucks,Phoenix Suns,3/4,140,X
 New Orleans Pelicans,Utah Jazz,3/4,140,X
 New York Knicks,Sacramento Kings,3/4,140,X
-LA Clippers,Los Angeles Lakers,3/4,140,NBA TV
+Los Angeles Clippers,Los Angeles Lakers,3/4,140,NBA TV
 Chicago Bulls,Indiana Pacers,3/5,141,X
 Orlando Magic,Philadelphia 76ers,3/5,141,X
 Houston Rockets,Toronto Raptors,3/5,141,TNT
@@ -983,7 +983,7 @@ Philadelphia 76ers,Houston Rockets,3/8,144,ESPN
 Utah Jazz,Memphis Grizzlies,3/8,144,X
 Toronto Raptors,New Orleans Pelicans,3/8,144,X
 Denver Nuggets,Golden State Warriors,3/8,144,ESPN
-Oklahoma City Thunder,LA Clippers,3/8,144,X
+Oklahoma City Thunder,Los Angeles Clippers,3/8,144,X
 Sacramento Kings,New York Knicks,3/9,145,X
 Brooklyn Nets,Atlanta Hawks,3/9,145,X
 Washington Wizards,Minnesota Timberwolves,3/9,145,X
@@ -1004,14 +1004,14 @@ Sacramento Kings,Washington Wizards,3/11,147,X
 Detroit Pistons,Brooklyn Nets,3/11,147,X
 Charlotte Hornets,Houston Rockets,3/11,147,X
 Oklahoma City Thunder,Utah Jazz,3/11,147,X
-Boston Celtics,LA Clippers,3/11,147,NBA TV
+Boston Celtics,Los Angeles Clippers,3/11,147,NBA TV
 New York Knicks,Indiana Pacers,3/12,148,X
 Cleveland Cavaliers,Philadelphia 76ers,3/12,148,X
 Los Angeles Lakers,Chicago Bulls,3/12,148,X
 Milwaukee Bucks,New Orleans Pelicans,3/12,148,TNT
 San Antonio Spurs,Dallas Mavericks,3/12,148,X
 Minnesota Timberwolves,Denver Nuggets,3/12,148,TNT
-Portland Trail Blazers,LA Clippers,3/12,148,X
+Portland Trail Blazers,Los Angeles Clippers,3/12,148,X
 Detroit Pistons,Miami Heat,3/13,149,ESPN
 Orlando Magic,Washington Wizards,3/13,149,X
 Memphis Grizzlies,Atlanta Hawks,3/13,149,X
@@ -1031,7 +1031,7 @@ Milwaukee Bucks,Miami Heat,3/15,151,X
 Phoenix Suns,Houston Rockets,3/15,151,X
 Portland Trail Blazers,New Orleans Pelicans,3/15,151,X
 New York Knicks,San Antonio Spurs,3/15,151,X
-Chicago Bulls,LA Clippers,3/15,151,NBA TV
+Chicago Bulls,Los Angeles Clippers,3/15,151,NBA TV
 Atlanta Hawks,Boston Celtics,3/16,152,X
 Memphis Grizzlies,Washington Wizards,3/16,152,X
 Phoenix Suns,New Orleans Pelicans,3/16,152,X
@@ -1047,7 +1047,7 @@ Toronto Raptors,Detroit Pistons,3/17,153,X
 Atlanta Hawks,Orlando Magic,3/17,153,X
 Chicago Bulls,Sacramento Kings,3/17,153,X
 Minnesota Timberwolves,Houston Rockets,3/17,153,ESPN
-Brooklyn Nets,LA Clippers,3/17,153,X
+Brooklyn Nets,Los Angeles Clippers,3/17,153,X
 Detroit Pistons,Cleveland Cavaliers,3/18,154,X
 Utah Jazz,Washington Wizards,3/18,154,X
 Denver Nuggets,Boston Celtics,3/18,154,X
@@ -1062,7 +1062,7 @@ Houston Rockets,Atlanta Hawks,3/19,155,X
 Los Angeles Lakers,Milwaukee Bucks,3/19,155,NBA TV
 Golden State Warriors,Minnesota Timberwolves,3/19,155,X
 Brooklyn Nets,Sacramento Kings,3/19,155,X
-Indiana Pacers,LA Clippers,3/19,155,NBA TV
+Indiana Pacers,Los Angeles Clippers,3/19,155,NBA TV
 Milwaukee Bucks,Cleveland Cavaliers,3/20,156,X
 New Orleans Pelicans,Orlando Magic,3/20,156,X
 Boston Celtics,Philadelphia 76ers,3/20,156,ESPN
@@ -1079,7 +1079,7 @@ Detroit Pistons,Phoenix Suns,3/21,157,X
 Dallas Mavericks,Sacramento Kings,3/21,157,X
 Indiana Pacers,Golden State Warriors,3/21,157,X
 Memphis Grizzlies,Orlando Magic,3/22,158,X
-LA Clippers,Cleveland Cavaliers,3/22,158,X
+Los Angeles Clippers,Cleveland Cavaliers,3/22,158,X
 Denver Nuggets,New York Knicks,3/22,158,X
 Oklahoma City Thunder,Toronto Raptors,3/22,158,X
 San Antonio Spurs,Houston Rockets,3/22,158,NBA TV
@@ -1093,7 +1093,7 @@ Minnesota Timberwolves,Memphis Grizzlies,3/23,159,X
 Dallas Mavericks,Golden State Warriors,3/23,159,X
 Detroit Pistons,Portland Trail Blazers,3/23,159,NBA TV
 Phoenix Suns,Sacramento Kings,3/23,159,X
-LA Clippers,New York Knicks,3/24,160,X
+Los Angeles Clippers,New York Knicks,3/24,160,X
 Cleveland Cavaliers,Milwaukee Bucks,3/24,160,X
 Denver Nuggets,Indiana Pacers,3/24,160,X
 Charlotte Hornets,Toronto Raptors,3/24,160,X
@@ -1110,7 +1110,7 @@ Boston Celtics,Cleveland Cavaliers,3/26,162,X
 Orlando Magic,Miami Heat,3/26,162,X
 Chicago Bulls,Toronto Raptors,3/26,162,X
 Houston Rockets,Milwaukee Bucks,3/26,162,TNT
-LA Clippers,Minnesota Timberwolves,3/26,162,X
+Los Angeles Clippers,Minnesota Timberwolves,3/26,162,X
 Atlanta Hawks,New Orleans Pelicans,3/26,162,X
 Sacramento Kings,Dallas Mavericks,3/26,162,X
 Detroit Pistons,Denver Nuggets,3/26,162,X
@@ -1125,7 +1125,7 @@ Brooklyn Nets,Philadelphia 76ers,3/28,164,X
 Dallas Mavericks,Miami Heat,3/28,164,X
 Toronto Raptors,New York Knicks,3/28,164,X
 Denver Nuggets,Houston Rockets,3/28,164,NBA TV
-LA Clippers,Milwaukee Bucks,3/28,164,X
+Los Angeles Clippers,Milwaukee Bucks,3/28,164,X
 Sacramento Kings,New Orleans Pelicans,3/28,164,X
 Cleveland Cavaliers,San Antonio Spurs,3/28,164,X
 Indiana Pacers,Boston Celtics,3/29,165,NBA TV
@@ -1134,7 +1134,7 @@ Golden State Warriors,Minnesota Timberwolves,3/29,165,X
 Denver Nuggets,Oklahoma City Thunder,3/29,165,X
 Washington Wizards,Utah Jazz,3/29,165,X
 Charlotte Hornets,Los Angeles Lakers,3/29,165,X
-Cleveland Cavaliers,LA Clippers,3/30,166,X
+Cleveland Cavaliers,Los Angeles Clippers,3/30,166,X
 Boston Celtics,Brooklyn Nets,3/30,166,X
 Sacramento Kings,Houston Rockets,3/30,166,X
 Portland Trail Blazers,Detroit Pistons,3/30,166,X
@@ -1149,7 +1149,7 @@ Los Angeles Lakers,New Orleans Pelicans,3/31,167,X
 Sacramento Kings,San Antonio Spurs,3/31,167,X
 Washington Wizards,Denver Nuggets,3/31,167,NBA TV
 Charlotte Hornets,Golden State Warriors,3/31,167,X
-Memphis Grizzlies,LA Clippers,3/31,167,X
+Memphis Grizzlies,Los Angeles Clippers,3/31,167,X
 Detroit Pistons,Indiana Pacers,4/1,168,X
 Miami Heat,Boston Celtics,4/1,168,NBA TV
 Milwaukee Bucks,Brooklyn Nets,4/1,168,X
@@ -1174,7 +1174,7 @@ Minnesota Timberwolves,Dallas Mavericks,4/3,170,X
 San Antonio Spurs,Denver Nuggets,4/3,170,X
 Utah Jazz,Phoenix Suns,4/3,170,X
 Memphis Grizzlies,Portland Trail Blazers,4/3,170,X
-Houston Rockets,LA Clippers,4/3,170,NBA TV
+Houston Rockets,Los Angeles Clippers,4/3,170,NBA TV
 Milwaukee Bucks,Philadelphia 76ers,4/4,171,TNT
 Cleveland Cavaliers,Sacramento Kings,4/4,171,X
 Golden State Warriors,Los Angeles Lakers,4/4,171,TNT
@@ -1190,7 +1190,7 @@ Sacramento Kings,Utah Jazz,4/5,172,X
 New Orleans Pelicans,Phoenix Suns,4/5,172,X
 Portland Trail Blazers,Denver Nuggets,4/5,172,ESPN
 Cleveland Cavaliers,Golden State Warriors,4/5,172,X
-Los Angeles Lakers,LA Clippers,4/5,172,X
+Los Angeles Lakers,Los Angeles Clippers,4/5,172,X
 Brooklyn Nets,Milwaukee Bucks,4/6,173,NBA TV
 Philadelphia 76ers,Chicago Bulls,4/6,173,NBA TV
 Miami Heat,Toronto Raptors,4/7,174,NBA TV
@@ -1203,7 +1203,7 @@ Phoenix Suns,Houston Rockets,4/7,174,NBA TV
 Atlanta Hawks,Milwaukee Bucks,4/7,174,X
 Orlando Magic,Boston Celtics,4/7,174,X
 Washington Wizards,New York Knicks,4/7,174,X
-LA Clippers,Golden State Warriors,4/7,174,NBA TV
+Los Angeles Clippers,Golden State Warriors,4/7,174,NBA TV
 Denver Nuggets,Portland Trail Blazers,4/7,174,X
 New Orleans Pelicans,Sacramento Kings,4/7,174,X
 Utah Jazz,Los Angeles Lakers,4/7,174,X
@@ -1227,5 +1227,5 @@ Chicago Bulls,Philadelphia 76ers,4/10,177,X
 Golden State Warriors,Memphis Grizzlies,4/10,177,X
 Oklahoma City Thunder,Milwaukee Bucks,4/10,177,X
 Dallas Mavericks,San Antonio Spurs,4/10,177,X
-Utah Jazz,LA Clippers,4/10,177,X
+Utah Jazz,Los Angeles Clippers,4/10,177,X
 Sacramento Kings,Portland Trail Blazers,4/10,177,X

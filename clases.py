@@ -103,6 +103,11 @@ class NBA:
             self.teams[code] = Team(code)
         return self.teams[code]
 
+    def pick_team_name(self, name):
+        for code in self.teams:
+            if self.teams[code].name == name:
+                return Team(code)
+
     def add_game(self, game):
         if game.date not in self.games:
             self.games[game.date] = []
@@ -131,8 +136,8 @@ class NBA:
                 if channel_name != "X":
                     channel = self.pick_channel(line["CHANNEL"])
 
-                away = self.pick_team(line["AWAY"])
-                home = self.pick_team(line["HOME"])
+                away = self.pick_team_name(line["AWAY"])
+                home = self.pick_team_name(line["HOME"])
 
                 date = datetime.datetime.strptime(line["DATE"], "%m/%d").date()
                 if date.month >= 10:
@@ -190,3 +195,8 @@ if __name__ == '__main__':
     nba.seed_flight_costs("datos/flight costs.csv")
     print("Seeds terminado")
 
+    for key in nba.teams:
+        print (key)
+    print ("-------------")
+    for game in nba.games:
+        print (game)
