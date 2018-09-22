@@ -10,6 +10,7 @@ class City:
 
         self.distances = {}  # dict with {[City] = distance (mi)}
         self.flights = {}  # dict with {[City] = cost}
+        self.referees = []  # list with actual refeeres (Referee)
 
     @property
     def hotel_cost(self):
@@ -18,6 +19,14 @@ class City:
     @hotel_cost.setter
     def hotel_cost(self, cost):
         self._hotel_cost = int(cost)
+
+    @property
+    def city_name(self):
+        return str(self.city.split(",")[0].strip().lower())
+
+    @property
+    def state(self):
+        return str(self.city.split(",")[1].strip().lower())
 
     def add_distance(self, city, distance):
         distance = int(distance)
@@ -37,6 +46,12 @@ class City:
 
         if to_city not in self.flights:
             self.flights[to_city] = cost
+
+    def add_referee(self, referee):
+        if referee not in self.referees:
+            self.referees.append(referee)
+            return True
+        return False
 
 
 class Team:
@@ -86,12 +101,24 @@ class Game:
             self.channel.add_game(self)
 
 
+class Referee:
+    def __init__(self, id, type, city, income, aditional_income):
+        self.id = id
+        self.type = type
+
+        self.city = city
+        self.city.add_referee(self)
+
+        self.income = income
+        self.aditional_income = aditional_income
+
 class NBA:
     def __init__(self):
         self.cities = {}  # dict with {[NAME] = City}
         self.channels = {}  # dict with {[NAME] = Channel}
         self.teams = {}  # dict with {[CODE] = Team}
         self.games = {}  # dict with {[DATE] = [Games]}
+        self.referees = {}  # dict wirh {[CODE] = Referee}
 
     def pick_city(self, name):
         if name not in self.cities:
@@ -190,6 +217,47 @@ class NBA:
                     to_city = self.teams[teams[idx1]].city
                     from_city.add_flight(to_city, cost)
 
+    def seed_referees(self, file):
+        with open(file, encoding='utf-8-sig') as csvfile:
+            lines = csv.DictReader(csvfile)
+            for line in lines:
+                code = line["Código del árbitro"]
+                type = line["Tipo de árbitro"]
+                income = line["Sueldo mensual [USD]"]
+                aditional_income = line["Pago adicional por partido dirigido [USD]"]
+
+                city = line["Ciudad en que vive"]
+                if "," in city:
+                    city_name, state = city.split(",", 1)
+                    city_name = city_name.strip().lower()
+                    state = state.strip().lower()
+                else:  # Washington DC
+                    city_name = "Washington".strip().lower()
+                    state = "D.C."
+
+                translate = {"auburn hills": "detroit",  # esto esta por mientras
+                             "filadelfia": "philadelphia",
+                             "los ángeles": "los angeles",
+                             "nueva orleans": "new orleans",
+                             "indianápolis": "indianapolis",
+                             "nueva york": "new york" }
+
+                if city_name in translate:
+                    city_name = translate[city_name]
+
+                city_found = None
+                for i in self.cities.values():
+                    if i.city_name == city_name:
+                        city_found = i
+                        break
+
+                if not city_found:
+                    raise Exception("No es posible encontrar la ciudad '{}' para arbitro id '{}'".format(city, code))
+
+                referee = Referee(code, type, city_found, income, aditional_income)
+                self.referees[code] = referee
+
+
 '''
 if __name__ == "__main__":
     nba = NBA()
@@ -199,11 +267,12 @@ if __name__ == "__main__":
     nba.seed_games("datos/games.csv")
     nba.seed_distances("datos/distances (mi & km).csv")
     nba.seed_flight_costs("datos/flight costs.csv")
+    nba.seed_referees("datos/referees.csv")
     print("Seeds terminado")
 
-    for key in nba.teams:
-        print(key)
-    print("-------------")
-    for game in nba.games:
-        print(game)
+    # for key in nba.teams:
+    #    print(key)
+    # print("-------------")
+    # for game in nba.games:
+    #    print(game)
 '''
