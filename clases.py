@@ -29,8 +29,11 @@ class City:
         return str(self.city.split(",")[1].strip().lower())
 
     def add_distance(self, city, distance):
+        if not distance:
+            distance = 0
         distance = int(distance)
         if self == city or distance == 0:
+            self.distances[city] = 0
             return
 
         if city not in self.distances:
@@ -95,10 +98,15 @@ class Game:
 
         self.date = date
         self.day = int(day)
+        self.referees = []
 
         self.channel = channel
         if self.channel:
             self.channel.add_game(self)
+
+    def assign_ref(self, ref):
+        self.referees.append(ref)
+        ref.city = self.home
 
 
 class Referee:
@@ -106,11 +114,17 @@ class Referee:
         self.id = id
         self.type = type
 
+        self.home = city
         self.city = city
         self.city.add_referee(self)
 
         self.income = income
         self.aditional_income = aditional_income
+
+        self.resting = 0
+        self.days_away = 0
+
+
 
 class NBA:
     def __init__(self):
@@ -138,13 +152,13 @@ class NBA:
     def pick_team_name(self, name):
         for code in self.teams:
             if self.teams[code].name == name:
-                return Team(code)
+                return self.teams[code]
         return False
 
     def add_game(self, game):
         if game.date not in self.games:
-            self.games[game.date] = []
-        self.games[game.date].append(game)
+            self.games[game.day] = []
+        self.games[game.day].append(game)
         return True
 
     def seed_locations(self, file):
@@ -159,6 +173,7 @@ class NBA:
                 city.hotel_cost = line["HOTEL COST"]
 
                 team.set_city(city)
+                self.teams[line["CODE"]] = team
 
     def seed_games(self, file):
         with open(file) as csvfile:
@@ -169,8 +184,11 @@ class NBA:
                 if channel_name != "X":
                     channel = self.pick_channel(line["CHANNEL"])
 
+
                 away = self.pick_team_name(line["AWAY"])
                 home = self.pick_team_name(line["HOME"])
+
+
 
                 date = datetime.datetime.strptime(line["DATE"], "%m/%d").date()
                 if date.month >= 10:
@@ -178,7 +196,7 @@ class NBA:
                 else:
                     date = date.replace(year=2019)
 
-                day = line["DAY"]
+                day = int(line["DAY"])
 
                 game = Game(home, away, date, day, channel)
                 self.add_game(game)
@@ -191,12 +209,12 @@ class NBA:
             for idx1, line in enumerate(lines):
                 team = line[0]
                 index_team = teams.index(team)
-                distances = line[index_team + 2:]
+                distances = line[index_team + 1:]
 
                 from_city = self.teams[team].city
 
                 for idx2, distance in enumerate(distances):
-                    to_city = self.teams[teams[idx1 + idx2 + 1]].city
+                    to_city = self.teams[teams[idx1 + idx2]].city
                     from_city.add_distance(to_city, distance)
 
     def seed_flight_costs(self, file):
@@ -257,8 +275,39 @@ class NBA:
                 referee = Referee(code, type, city_found, income, aditional_income)
                 self.referees[code] = referee
 
+    def order_costs(self, game):
+        refs =  [r for r in self.referees.values()]
+        refs.sort(key=lambda x: int(x.city.distances[game.home.city]), reverse=False)
+        return refs
 
-'''
+def is_valid(ref, game):
+    if ref.home == game.home.city:
+        return 0
+    #blah blah
+
+def backtrack(nba, day, num_game):
+    if (day >= 177 && numb_game >= 10)
+        return 1
+    if (day > 1 and num_game == 1):
+        #update_all_refs()
+    game = nba.games[day][num_game]
+    refs = nba.order_costs(game)
+    for ref in refs:
+        if is_valid(ref, game):
+            #move the ref there
+            if num_game == len(nba.games[day]):
+                if backtrack(nba, day+1, 1):
+                    return (1)
+                #revert_all_refs();
+            else:
+                if backtrack(nba, day, num_game + 1):
+                    return (1)
+            #move ref back
+    return (0);
+
+
+
+
 if __name__ == "__main__":
     nba = NBA()
 
@@ -269,10 +318,13 @@ if __name__ == "__main__":
     nba.seed_flight_costs("datos/flight costs.csv")
     nba.seed_referees("datos/referees.csv")
     print("Seeds terminado")
-
-    # for key in nba.teams:
-    #    print(key)
-    # print("-------------")
     # for game in nba.games:
-    #    print(game)
-'''
+    #     print(str(nba.games[game][0].home.city) + " vs " + str(nba.games[game][0].away.city))
+    test_game = next(iter(nba.games.values()))[0]
+    test_refs = nba.order_costs(test_game)
+    print(test_game.home.city.city_name)
+    for r in test_refs:
+        print (str(r.id) + ": " + str(test_game.home.city.distances[r.city]))
+        # i+=1
+    # print(test_refs[0].id)
+    # print(test_game.home.city.city_name)
