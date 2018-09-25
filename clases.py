@@ -108,6 +108,11 @@ class Game:
         self.referees.append(ref)
         ref.city = self.home
 
+    def has_all_refs(self):
+        if len(self.referees) < 3:
+            return 0
+        return 1
+
 
 class Referee:
     def __init__(self, id, type, city, income, aditional_income):
@@ -115,6 +120,7 @@ class Referee:
         self.type = type
 
         self.home = city
+        self.prev_city = city
         self.city = city
         self.city.add_referee(self)
 
@@ -123,6 +129,55 @@ class Referee:
 
         self.resting = 0
         self.days_away = 0
+
+        self.moved_today = 0
+        self.moved_yesterday = 0
+        self.refdays = []
+        self.refgames = []
+
+        self.timelime = []
+
+    def is_valid(self, game):
+        if self in game.referees:
+            return 0
+        if self.moved_today == 1:
+            return 0
+        if self.home == game.home.city:
+            return 0
+        if 0 < self.resting < 3:
+            return 0
+        if self.days_away > 4:
+            return 0
+        return 1
+
+    def move_home(self):
+        self.resting = 1
+        self.days_away = 0
+        self.prev_city = self.city
+        self.city = self.home
+
+    # def move_back(self):
+    #     self.resting = 0
+
+    def assign_game(self, game):
+        self.prev_city = self.city
+        self.city = game.home.city
+        self.days_away += 1
+        self.refdays.append(game.day)
+        self.refgames.append(game)
+        game.referees.append(self)
+        self.moved_yesterday = self.moved_today
+        self.moved_today = 1
+
+    def unassign_game(self, game):
+
+        self.city = self.prev_city
+        self.days_away -= 1
+        self.refdays.remove(game.day)
+        self.refgames.remove(game)
+        game.referees.remove(self)
+        self.moved_today = self.moved_yesterday
+        # self.moved_today = 0
 
 
 
@@ -133,6 +188,18 @@ class NBA:
         self.teams = {}  # dict with {[CODE] = Team}
         self.games = {}  # dict with {[DATE] = [Games]}
         self.referees = {}  # dict wirh {[CODE] = Referee}
+
+    def update_all_refs(self):
+        refs =  [r for r in self.referees.values()]
+        for ref in refs:
+            ref.moved_today = 0
+            if ref.resting:
+                ref.resting += 1
+            if ref.days_away > 4:
+                ref.move_home()
+
+
+
 
     def pick_city(self, name):
         if name not in self.cities:
@@ -156,7 +223,7 @@ class NBA:
         return False
 
     def add_game(self, game):
-        if game.date not in self.games:
+        if game.day not in self.games:
             self.games[game.day] = []
         self.games[game.day].append(game)
         return True
@@ -280,30 +347,52 @@ class NBA:
         refs.sort(key=lambda x: int(x.city.distances[game.home.city]), reverse=False)
         return refs
 
-def is_valid(ref, game):
-    if ref.home == game.home.city:
-        return 0
-    #blah blah
+    def make_timeline(self):
+        refs =  [r for r in self.referees.values()]
+        for r in refs:
+            for day in self.games:
+                if day in r.refdays:
+                    for game in r.refgames:
+                        if game.day == day:
+                            r.timelime.append(game.home.code)
+                            break
+                else:
+                    r.timelime.append("-")
+
+
+
+
+
 
 def backtrack(nba, day, num_game):
-    if (day >= 177 && numb_game >= 10)
+    # if (day >= 177 and num_game >= 10):
+    if (day >= 47 and num_game >= 3):      # END CONDITION
         return 1
-    if (day > 1 and num_game == 1):
-        #update_all_refs()
-    game = nba.games[day][num_game]
-    refs = nba.order_costs(game)
+    if (day > 1 and num_game == 1):         # NEW DAY, UPDATE COUNTERS
+        nba.update_all_refs()
+    if (day in nba.games):                  # SOME DAYS DON'T HAVE GAMES
+        game = nba.games[day][num_game-1]
+        refs = nba.order_costs(game)
+    else:
+        return backtrack(nba, day + 1, 1)
+
     for ref in refs:
-        if is_valid(ref, game):
+        if ref.is_valid(game):
+            ref.assign_game(game)                           # IF VALID: ASSIGN
             #move the ref there
-            if num_game == len(nba.games[day]):
-                if backtrack(nba, day+1, 1):
-                    return (1)
-                #revert_all_refs();
+            if not game.has_all_refs():
+                return backtrack(nba, day, num_game)
             else:
-                if backtrack(nba, day, num_game + 1):
-                    return (1)
+                if num_game >= len(nba.games[day]):         # IF LAST GAME, GO TO NEXT DAY
+                    if backtrack(nba, day+1, 1):
+                        return (1)
+                    #revert_all_refs();
+                else:
+                    if backtrack(nba, day, num_game + 1):   # GO TO NEXT GAME
+                        return (1)
+            ref.unassign_game(game)
             #move ref back
-    return (0);
+    return (0)
 
 
 
@@ -318,13 +407,15 @@ if __name__ == "__main__":
     nba.seed_flight_costs("datos/flight costs.csv")
     nba.seed_referees("datos/referees.csv")
     print("Seeds terminado")
-    # for game in nba.games:
-    #     print(str(nba.games[game][0].home.city) + " vs " + str(nba.games[game][0].away.city))
-    test_game = next(iter(nba.games.values()))[0]
-    test_refs = nba.order_costs(test_game)
-    print(test_game.home.city.city_name)
-    for r in test_refs:
-        print (str(r.id) + ": " + str(test_game.home.city.distances[r.city]))
-        # i+=1
-    # print(test_refs[0].id)
-    # print(test_game.home.city.city_name)
+
+    backtrack(nba, 1, 1)
+
+    for i in range(1,47):
+        if i in nba.games:
+            print("--------- DAY " + str(i) + " -----------")
+            g = 1
+            for game in nba.games[i]:
+                refs =  [r.id for r in game.referees]
+                print("Game " + str(g) +": " + str(refs))
+                g += 1
+    nba.make_timeline()
