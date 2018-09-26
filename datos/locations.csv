@@ -1,31 +1,31 @@
-TEAM,CODE,ARENA,CITY,HOTEL COST
-Atlanta Hawks,ATL,Philips Arena,"Atlanta, Georgia",70
-Boston Celtics,BOS,TD Garden,"Boston, Massachusetts",287
-Brooklyn Nets,BRK,Barclays Center,"Brooklyn, New York",257
-Charlotte Hornets,CHA,Spectrum Center,"Charlotte, North Carolina",127
-Chicago Bulls,CHI,United Center,"Chicago, Illinois",215
-Cleveland Cavaliers,CLE,Quicken Loans Arena,"Cleveland, Ohio",134
-Dallas Mavericks,DAL,American Airlines Center,"Dallas, Texas",142
-Denver Nuggets,DEN,Pepsi Center,"Denver, Colorado",180
-Detroit Pistons,DET,Little Caesars Arena,"Detroit, Michigan",126
-Golden State Warriors,GSW,Oracle Arena,"Oakland, California",161
-Houston Rockets,HOU,Toyota Center,"Houston, Texas",121
-Indiana Pacers,IND,Bankers Life Fieldhouse,"Indianapolis, Indiana",119
-Los Angeles Clippers,LAC,Staples Center,"Los Angeles, California",173
-Los Angeles Lakers,LAL,Staples Center,"Los Angeles, California",173
-Memphis Grizzlies,MEM,FedExForum,"Memphis, Tennessee",117
-Miami Heat,MIA,American Airlines Arena,"Miami, Florida",119
-Milwaukee Bucks,MIL,Fiserv Forum,"Milwaukee, Wisconsin",141
-Minnesota Timberwolves,MIN,Target Center,"Minneapolis, Minnesota",149
-New Orleans Pelicans,NOP,Smoothie King Center,"New Orleans, Louisiana",148
-New York Knicks,NYK,Madison Square Garden,"New York, New York",291
-Oklahoma City Thunder,OKC,Chesapeake Energy Arena,"Oklahoma City, Oklahoma",87
-Orlando Magic,ORL,Amway Center,"Orlando, Florida",121
-Philadelphia 76ers,PHI,Wells Fargo Center,"Philadelphia, Pennsylvania",185
-Phoenix Suns,PHX,Talking Stick Resort Arena,"Phoenix, Arizona",124
-Portland Trail Blazers,POR,Moda Center,"Portland, Oregon",182
-Sacramento Kings,SAC,Golden 1 Center,"Sacramento, California",119
-San Antonio Spurs,SAS,AT&T Center,"San Antonio, Texas",124
-Toronto Raptors,TOR,Scotiabank Arena,"Toronto, Ontario",188
-Utah Jazz,UTA,Vivint Smart Home Arena,"Salt Lake City, Utah",117
-Washington Wizards,WSH,Capital One Arena,"Washington, D.C.",250
+ID,TEAM,CODE,ARENA,CITY,HOTEL COST
+1,Atlanta Hawks,ATL,Philips Arena,"Atlanta, Georgia",70
+2,Boston Celtics,BOS,TD Garden,"Boston, Massachusetts",287
+3,Brooklyn Nets,BRK,Barclays Center,"Brooklyn, New York",257
+4,Charlotte Hornets,CHA,Spectrum Center,"Charlotte, North Carolina",127
+5,Chicago Bulls,CHI,United Center,"Chicago, Illinois",215
+6,Cleveland Cavaliers,CLE,Quicken Loans Arena,"Cleveland, Ohio",134
+7,Dallas Mavericks,DAL,American Airlines Center,"Dallas, Texas",142
+8,Denver Nuggets,DEN,Pepsi Center,"Denver, Colorado",180
+9,Detroit Pistons,DET,Little Caesars Arena,"Detroit, Michigan",126
+10,Golden State Warriors,GSW,Oracle Arena,"Oakland, California",161
+11,Houston Rockets,HOU,Toyota Center,"Houston, Texas",121
+12,Indiana Pacers,IND,Bankers Life Fieldhouse,"Indianapolis, Indiana",119
+13,Los Angeles Clippers,LAC,Staples Center,"Los Angeles, California",173
+14,Los Angeles Lakers,LAL,Staples Center,"Los Angeles, California",173
+15,Memphis Grizzlies,MEM,FedExForum,"Memphis, Tennessee",117
+16,Miami Heat,MIA,American Airlines Arena,"Miami, Florida",119
+17,Milwaukee Bucks,MIL,Fiserv Forum,"Milwaukee, Wisconsin",141
+18,Minnesota Timberwolves,MIN,Target Center,"Minneapolis, Minnesota",149
+19,New Orleans Pelicans,NOP,Smoothie King Center,"New Orleans, Louisiana",148
+20,New York Knicks,NYK,Madison Square Garden,"New York, New York",291
+21,Oklahoma City Thunder,OKC,Chesapeake Energy Arena,"Oklahoma City, Oklahoma",87
+22,Orlando Magic,ORL,Amway Center,"Orlando, Florida",121
+23,Philadelphia 76ers,PHI,Wells Fargo Center,"Philadelphia, Pennsylvania",185
+24,Phoenix Suns,PHX,Talking Stick Resort Arena,"Phoenix, Arizona",124
+25,Portland Trail Blazers,POR,Moda Center,"Portland, Oregon",182
+26,Sacramento Kings,SAC,Golden 1 Center,"Sacramento, California",119
+27,San Antonio Spurs,SAS,AT&T Center,"San Antonio, Texas",124
+28,Toronto Raptors,TOR,Scotiabank Arena,"Toronto, Ontario",188
+29,Utah Jazz,UTA,Vivint Smart Home Arena,"Salt Lake City, Utah",117
+30,Washington Wizards,WSH,Capital One Arena,"Washington, D.C.",250
