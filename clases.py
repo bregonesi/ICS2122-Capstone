@@ -458,8 +458,8 @@ if __name__ == "__main__":
 
 
 
-
-    # refs.sort(key=lambda x: len(set(x.timeline)), reverse=False)
-    # for ref in refs:
-    #     print ("ID:" + str(ref.id) + "\nHOME: " + str(ref.home.city_name) + "\nDIF.CITIES:" + str(len(set(ref.timeline))) + "\nCITIES:" + str(set(ref.timeline)) + "\n")
+    refs =  [r for r in nba.referees.values()]
+    refs.sort(key=lambda x: len(set(x.timeline)), reverse=False)
+    for ref in refs:
+        print ("ID:" + str(ref.id) + "\nHOME: " + str(ref.home.city_name) + "\nDIF.CITIES:" + str(len(set(ref.timeline))) + "\nCITIES:" + str(set(ref.timeline)) + "\n")
         # print(str(ref.timeline))
