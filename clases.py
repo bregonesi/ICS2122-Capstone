@@ -1,11 +1,10 @@
 import datetime
 import csv
 import sys
+
 sys.setrecursionlimit(10000)
 from tabulate import tabulate
 import csv
-
-
 
 
 class City:
@@ -32,7 +31,7 @@ class City:
         return str(self.city.split(",")[0].strip().lower())
 
     @property
-    def state(self):
+    def city_state(self):
         return str(self.city.split(",")[1].strip().lower())
 
     def add_distance(self, city, distance):
@@ -51,9 +50,6 @@ class City:
 
     def add_flight(self, to_city, cost):
         cost = int(cost)
-        if self == to_city or cost == 0:
-            return
-
         if to_city not in self.flights:
             self.flights[to_city] = cost
 
@@ -112,19 +108,42 @@ class Game:
             self.channel.add_game(self)
 
     def assign_ref(self, ref):
+        if self.has_all_refs:
+            raise "All ref are assigned"
+
         self.referees.append(ref)
         ref.city = self.home.city
 
-    def has_all_refs(self):
-        if len(self.referees) < 3:
-            return 0
-        return 1
+    @property
+    def has_all_refs(self):  # checks if all refs depending on type and ref type are correct
+        if len(self.referees) < 2:  # every game must have at least 2 referees
+            return False
+
+        principales = 0
+        colaboradores = 0
+        for referee in self.referees:
+            if "principal" in referee.type:  # use lowercase
+                principales += 1
+            if "colaborador" in referee.type:
+                colaboradores += 1
+
+        if self.channel and self.channel.name == "ESPN":  # this combination must have 3 referees
+            if len(self.referees) < 3:
+                return False
+            else:
+                if not (principales >= 1 and colaboradores >= 2):
+                    return False
+        else:
+            if not (principales >= 1 and colaboradores >= 1):
+                return False
+
+        return True  # if neither of the if, return True
 
 
 class Referee:
     def __init__(self, id, type, city, income, aditional_income):
         self.id = id
-        self.type = type
+        self.type = type.strip().lower()
 
         self.home = city
         self.prev_city = city
@@ -187,17 +206,16 @@ class Referee:
         # self.moved_today = 0
 
 
-
 class NBA:
     def __init__(self):
         self.cities = {}  # dict with {[NAME] = City}
         self.channels = {}  # dict with {[NAME] = Channel}
         self.teams = {}  # dict with {[CODE] = Team}
         self.games = {}  # dict with {[DATE] = [Games]}
-        self.referees = {}  # dict wirh {[CODE] = Referee}
+        self.referees = {}  # dict with {[CODE] = Referee}
 
     def update_all_refs(self):
-        refs =  [r for r in self.referees.values()]
+        refs = [r for r in self.referees.values()]
         for ref in refs:
             ref.moved_today = 0
             if ref.resting:
@@ -208,17 +226,13 @@ class NBA:
                 ref.days_away += 1
             ref.timeline.append(ref.city.id)
 
-
     def revert_all_refs(self):
         print("REEVEVVEERTTTT")
-        refs =  [r for r in self.referees.values()]
+        refs = [r for r in self.referees.values()]
         for ref in refs:
             ref.timeline = ref.timeline[:-1]
+
     #
-
-
-
-
 
     def pick_city(self, id, name):
         if name not in self.cities:
@@ -271,11 +285,8 @@ class NBA:
                 if channel_name != "X":
                     channel = self.pick_channel(line["CHANNEL"])
 
-
                 away = self.pick_team_name(line["AWAY"])
                 home = self.pick_team_name(line["HOME"])
-
-
 
                 date = datetime.datetime.strptime(line["DATE"], "%m/%d").date()
                 if date.month >= 10:
@@ -316,8 +327,8 @@ class NBA:
                 from_city = self.teams[team].city
 
                 for idx1, cost in enumerate(costs):
-                    if cost == 0 or not cost:
-                        continue
+                    if cost == 0 or not cost:  # misma ciudad
+                        cost = 0
 
                     to_city = self.teams[teams[idx1]].city
                     from_city.add_flight(to_city, cost)
@@ -333,19 +344,19 @@ class NBA:
 
                 city = line["Ciudad en que vive"]
                 if "," in city:
-                    city_name, state = city.split(",", 1)
+                    city_name, city_state = city.split(",", 1)
                     city_name = city_name.strip().lower()
-                    state = state.strip().lower()
+                    city_state = city_state.strip().lower()
                 else:  # Washington DC
                     city_name = "Washington".strip().lower()
-                    state = "D.C."
+                    city_state = "D.C."
 
                 translate = {"auburn hills": "detroit",  # esto esta por mientras
                              "filadelfia": "philadelphia",
                              "los ángeles": "los angeles",
                              "nueva orleans": "new orleans",
                              "indianápolis": "indianapolis",
-                             "nueva york": "new york" }
+                             "nueva york": "new york"}
 
                 if city_name in translate:
                     city_name = translate[city_name]
@@ -363,12 +374,12 @@ class NBA:
                 self.referees[code] = referee
 
     def order_costs(self, game):
-        refs =  [r for r in self.referees.values()]
-        refs.sort(key=lambda x: int(x.city.distances[game.home.city]), reverse=False)
+        refs = [r for r in self.referees.values()]
+        refs.sort(key=lambda x: int(x.city.flights[game.home.city]), reverse=False)
         return refs
 
     def make_timeline(self):
-        refs =  [r for r in self.referees.values()]
+        refs = [r for r in self.referees.values()]
         for r in refs:
             for day in self.games:
                 if day in r.refdays:
@@ -380,15 +391,11 @@ class NBA:
                     r.timeline.append("-")
 
 
-
-
-
-
 def backtrack(nba, day, num_game):
-    if (day >= 178):                        # END CONDITION
+    if (day >= 178):  # END CONDITION
         return 1
-    if (day in nba.games):                  # SOME DAYS DON'T HAVE GAMES
-        game = nba.games[day][num_game-1]
+    if (day in nba.games):  # SOME DAYS DON'T HAVE GAMES
+        game = nba.games[day][num_game - 1]
         refs = nba.order_costs(game)
     else:
         nba.update_all_refs()
@@ -396,35 +403,35 @@ def backtrack(nba, day, num_game):
 
     for ref in refs:
         if ref.is_valid(game):
-            ref.assign_game(game)                           # IF VALID: ASSIGN
-            #move the ref there
-            if not game.has_all_refs():
-                return backtrack(nba, day, num_game)        # STAY ON THIS DAY and GAME
+            ref.assign_game(game)  # IF VALID: ASSIGN
+            # move the ref there
+            if not game.has_all_refs:
+                return backtrack(nba, day, num_game)  # STAY ON THIS DAY and GAME
             else:
                 if num_game >= len(nba.games[day]):
                     nba.update_all_refs()
-                    if backtrack(nba, day+1, 1):             # IF LAST GAME, GO TO NEXT DAY
+                    if backtrack(nba, day + 1, 1):  # IF LAST GAME, GO TO NEXT DAY
                         return (1)
                     # revert_all_refs();
                 else:
-                    if backtrack(nba, day, num_game + 1):   # GO TO NEXT GAME
+                    if backtrack(nba, day, num_game + 1):  # GO TO NEXT GAME
                         return (1)
             ref.unassign_game(game)
-            #move ref back
+            # move ref back
     return (0)
 
 
 def export():
     csvfile = "datos/timeline.csv"
-    refs =  [r for r in nba.referees.values()]
+    refs = [r for r in nba.referees.values()]
     data = [t.timeline for t in refs]
-    days = [i for i in range(1,178)]
+    days = [i for i in range(1, 178)]
     data.insert(0, days)
     data[0].insert(0, "-")
     i = 0
     for d in data:
         if i != 0:
-            d.insert(0,i)
+            d.insert(0, i)
         i += 1
 
     with open(csvfile, "w") as output:
@@ -445,21 +452,29 @@ if __name__ == "__main__":
 
     backtrack(nba, 1, 1)
 
-    for i in range(1,178):
-        if i in nba.games:
-            print("--------- DAY " + str(i) + " -----------")
-            g = 1
-            for game in nba.games[i]:
-                refs =  [r.id for r in game.referees]
-                print("Game " + str(g) +": " + str(refs))
-                g += 1
+    with open("games-days.txt", "w") as day_games:
+        for i in range(1, 178):
+            if i in nba.games:
+                print("--------- DAY " + str(i) + " -----------")
+                day_games.write("--------- DAY " + str(i) + " -----------\n")
+                g = 1
+                for game in nba.games[i]:
+                    refs = [r.id for r in game.referees]
+
+                    string = "Game {}: {}".format(g, refs)
+                    print(string)
+                    day_games.write(string + "\n")
+
+                    g += 1
     export()
 
-
-
-
-    refs =  [r for r in nba.referees.values()]
+    refs = [r for r in nba.referees.values()]
     refs.sort(key=lambda x: len(set(x.timeline)), reverse=False)
-    for ref in refs:
-        print ("ID:" + str(ref.id) + "\nHOME: " + str(ref.home.city_name) + "\nDIF.CITIES:" + str(len(set(ref.timeline))) + "\nCITIES:" + str(set(ref.timeline)) + "\n")
-        # print(str(ref.timeline))
+    with open("refs-info.txt", "w") as refs_info:
+        for ref in refs:
+            string = "ID: {0.id}\n" \
+                     "Home: {0.home.city_name}\n" \
+                     "Dif Cities: {1}\n" \
+                     "Cities: {2}\n".format(ref, len(set(ref.timeline)), set(ref.timeline))
+            print(string)
+            refs_info.write(string + "\n")

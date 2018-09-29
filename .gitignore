@@ -6,3 +6,6 @@ __pycache__/
 
 # Nose que es esto
 .idea/
+
+# Ignorar resultados en txt
+*.txt
