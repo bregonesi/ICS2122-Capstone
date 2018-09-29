@@ -109,12 +109,45 @@ class Game:
 
     def assign_ref(self, ref):
         if self.has_all_refs:
-            raise "All ref are assigned"
+            raise Exception("All refs are assigned to this game {}".format(vars(self)))
+
+        if not self.can_assign_ref(ref):
+            raise Exception("Error. Can't assign referee or it will be invalid")
 
         self.referees.append(ref)
         ref.city = self.home.city
 
-    @property
+    def can_assign_ref(self, ref):  # check if referee is allowed to be assigned
+        if self.channel and self.channel.name == "ESPN":
+            if len(self.referees) >= 3:
+                return False
+        else:
+            if len(self.referees) >= 2:
+                return False
+
+        if ref.type == "principal y colaborador":
+            return True
+
+        principales = 0
+        colaboradores = 0
+        for referee in self.referees + [ref]:
+            if "principal" in referee.type:  # use lowercase
+                principales += 1
+            if "colaborador" in referee.type:
+                colaboradores += 1
+
+        principales_limit = 1
+        colaboradores_limit = 1
+        if self.channel and self.channel.name == "ESPN":  # this combination must have 3 referees
+            colaboradores_limit = 2
+
+        if principales >= principales_limit:
+            return False
+        if colaboradores >= colaboradores_limit:
+            return False
+
+        return True  # if neither of the other, return True
+
     def has_all_refs(self):  # checks if all refs depending on type and ref type are correct
         if len(self.referees) < 2:  # every game must have at least 2 referees
             return False
@@ -146,9 +179,9 @@ class Referee:
         self.type = type.strip().lower()
 
         self.home = city
-        self.prev_city = city
-        self.city = city
-        self.city.add_referee(self)
+        #self.prev_city = city  # hay q cambiar a timeline para poder retroceder mas de un dia
+        #self.city = city
+        self.home.add_referee(self)
 
         self.income = income
         self.aditional_income = aditional_income
@@ -156,48 +189,62 @@ class Referee:
         self.resting = 0
         self.days_away = 0
 
-        self.moved_today = 0
-        self.moved_yesterday = 0
+        self.moved_today = False
+        self.moved_yesterday = False
         self.refdays = []
         self.refgames = []
 
-        self.timeline = []
+        self.timeline = [self.home]  # cities where it've been
+
+    @property
+    def city(self):
+        return self.timeline[-1]
 
     def is_valid(self, game):
-        if self in game.referees:
-            return 0
-        if self.moved_today == 1:
-            return 0
-        if self.home == game.home.city:
-            return 0
-        if 0 < self.resting < 3:
-            return 0
-        if self.days_away > 4:
-            return 0
-        return 1
+        if self in game.referees:  # it's already on the game
+            return False
+        #if self.moved_today:  # can't refer on the same day
+        #    return False
+        if self.home == game.home.city:  # can't refer at home
+            return False
+        if self.city == self.home and 0 < self.resting < 3:  # if at home, it must rest at least 3 days
+            return False
+        if self.days_away > 4:  # can't be more than 4 days outside
+            return False
+        return game.can_assign_ref(self)
+        #return True
+
+    def move_city(self, from_city, to_city):
+        if from_city == to_city:
+            raise Exception("Cant move to the same city")
+
+        self.timeline.append(to_city)
+        from_city.referees.remove(self)
+        to_city.referees.append(self)
 
     def move_home(self):
         self.resting = 1
         self.days_away = 0
-        self.prev_city = self.city
-        self.city = self.home
+        self.move_city(self.timeline[-1], self.home)
 
     # def move_back(self):
     #     self.resting = 0
 
     def assign_game(self, game):
-        self.prev_city = self.city
-        self.city = game.home.city
+        if self.city != game.home.city:  # if he needs to move
+            self.move_city(self.timeline[-1], game.home.city)
         # self.days_away += 1
         self.refdays.append(game.day)
         self.refgames.append(game)
         game.referees.append(self)
         self.moved_yesterday = self.moved_today
-        self.moved_today = 1
+        self.moved_today = True
 
     def unassign_game(self, game):
-
-        self.city = self.prev_city
+        print("unassign")
+        # recibe game, pero retrocede una ciudad, no elimina la ciudad de ese game :/
+        self.move_city(self.timeline[-1], self.timeline[-2])  # go back one city
+        self.timeline = self.timeline[:-2]  # delete last city (-2 item) and avoid duplicated city (-1 item)
         # self.days_away -= 1
         self.refdays.remove(game.day)
         self.refgames.remove(game)
@@ -217,20 +264,22 @@ class NBA:
     def update_all_refs(self):
         refs = [r for r in self.referees.values()]
         for ref in refs:
-            ref.moved_today = 0
+            ref.moved_today = False
             if ref.resting:
                 ref.resting += 1
             if ref.days_away > 4:
                 ref.move_home()
             if ref.city != ref.home:
                 ref.days_away += 1
-            ref.timeline.append(ref.city.id)
+            #ref.timeline.append(ref.city.id)
 
     def revert_all_refs(self):
         print("REEVEVVEERTTTT")
         refs = [r for r in self.referees.values()]
         for ref in refs:
-            ref.timeline = ref.timeline[:-1]
+            ref.move_city(ref.timeline[-1], ref.timeline[-2])  # go back one city
+            ref.timeline = ref.timeline[:-2]  # delete last city (-2 item) and avoid duplicated city (-1 item)
+            #ref.timeline = ref.timeline[:-1]
 
     #
 
@@ -392,9 +441,10 @@ class NBA:
 
 
 def backtrack(nba, day, num_game):
-    if (day >= 178):  # END CONDITION
-        return 1
-    if (day in nba.games):  # SOME DAYS DON'T HAVE GAMES
+    if day >= 178:  # END CONDITION
+        return True
+
+    if day in nba.games:  # SOME DAYS DON'T HAVE GAMES
         game = nba.games[day][num_game - 1]
         refs = nba.order_costs(game)
     else:
@@ -404,21 +454,23 @@ def backtrack(nba, day, num_game):
     for ref in refs:
         if ref.is_valid(game):
             ref.assign_game(game)  # IF VALID: ASSIGN
-            # move the ref there
-            if not game.has_all_refs:
-                return backtrack(nba, day, num_game)  # STAY ON THIS DAY and GAME
+
+            if not game.has_all_refs():
+                if backtrack(nba, day, num_game):  # STAY ON THIS DAY and GAME
+                    return True
             else:
                 if num_game >= len(nba.games[day]):
                     nba.update_all_refs()
                     if backtrack(nba, day + 1, 1):  # IF LAST GAME, GO TO NEXT DAY
-                        return (1)
+                        return True
                     # revert_all_refs();
                 else:
                     if backtrack(nba, day, num_game + 1):  # GO TO NEXT GAME
-                        return (1)
+                        return True
+
             ref.unassign_game(game)
             # move ref back
-    return (0)
+    return False
 
 
 def export():
@@ -461,12 +513,12 @@ if __name__ == "__main__":
                 for game in nba.games[i]:
                     refs = [r.id for r in game.referees]
 
-                    string = "Game {}: {}".format(g, refs)
+                    string = "Game {}: {}; Channel: {}".format(g, refs, game.channel and game.channel.name)
                     print(string)
                     day_games.write(string + "\n")
 
                     g += 1
-    export()
+    #export()
 
     refs = [r for r in nba.referees.values()]
     refs.sort(key=lambda x: len(set(x.timeline)), reverse=False)
@@ -475,6 +527,6 @@ if __name__ == "__main__":
             string = "ID: {0.id}\n" \
                      "Home: {0.home.city_name}\n" \
                      "Dif Cities: {1}\n" \
-                     "Cities: {2}\n".format(ref, len(set(ref.timeline)), set(ref.timeline))
+                     "Cities: {2}\n".format(ref, len(set(ref.timeline)), set(map(lambda x: x.city, ref.timeline)))
             print(string)
             refs_info.write(string + "\n")
