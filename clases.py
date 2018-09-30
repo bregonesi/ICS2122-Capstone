@@ -107,15 +107,54 @@ class Game:
         if self.channel:
             self.channel.add_game(self)
 
-    def assign_ref(self, ref):
-        if self.has_all_refs:
+        self.costs = {}
+
+    @property
+    def cost(self):
+        total_cost = 0
+        for item in self.costs.values():
+            for entry in item.values():
+                total_cost = sum(entry)
+        return total_cost
+
+    def add_cost(self, producer_key, detail_key, cost):
+        cost = int(cost)
+
+        if producer_key not in self.costs:
+            self.costs[producer_key] = {}
+
+        if detail_key not in self.costs[producer_key]:
+            self.costs[producer_key][detail_key] = []
+
+        self.costs[producer_key][detail_key].append(cost)
+
+    def remove_cost(self, producer_key, detail_key, cost):
+        cost = int(cost)
+
+        self.costs[producer_key][detail_key].remove(cost)
+
+        if not self.costs[producer_key][detail_key]:
+            del self.costs[producer_key][detail_key]
+
+        if not self.costs[producer_key]:
+            del self.costs[producer_key]
+
+    def assign_ref(self, ref, type):
+        if self.has_all_refs():
             raise Exception("All refs are assigned to this game {}".format(vars(self)))
 
         if not self.can_assign_ref(ref):
             raise Exception("Error. Can't assign referee or it will be invalid")
 
+        if not ref.current_city == self.home.city:
+            raise Exception("Error. Referee has not travelled yet.")
+
         self.referees.append(ref)
-        ref.city = self.home.city
+        ref.refgames.append(self)
+
+    def undo_assign_ref(self, ref, type):
+        self.referees.remove(ref)
+        ref.refgames.remove(self)
 
     def can_assign_ref(self, ref):  # check if referee is allowed to be assigned
         if self.channel and self.channel.name == "ESPN":
@@ -191,66 +230,70 @@ class Referee:
 
         self.moved_today = False
         self.moved_yesterday = False
-        self.refdays = []
+        #self.refdays = []
         self.refgames = []
 
         self.timeline = [self.home]  # cities where it've been
 
     @property
-    def city(self):
+    def current_city(self):
         return self.timeline[-1]
+
+    @property
+    def last_day_refer(self):
+        return self.refgames[-1].day if len(self.refgames) else 0
 
     def is_valid(self, game):
         if self in game.referees:  # it's already on the game
             return False
-        #if self.moved_today:  # can't refer on the same day
-        #    return False
+
+        if self.last_day_refer > game.day:  # esto no deberia pasar, pero asi chequeamos que todo vaya bien
+            raise Exception("There is an error. Last day refer {}, game day {}".format(self.last_day_refer, game.day))
+
+        if self.last_day_refer == game.day:  # only can refer once a day
+            return False
+
         if self.home == game.home.city:  # can't refer at home
             return False
-        if self.city == self.home and 0 < self.resting < 3:  # if at home, it must rest at least 3 days
+
+        if self.current_city == self.home and 0 < self.resting < 3:  # if at home, it must rest at least 3 days
             return False
+
         if self.days_away > 4:  # can't be more than 4 days outside
             return False
+
         return game.can_assign_ref(self)
         #return True
 
-    def move_city(self, from_city, to_city):
-        if from_city == to_city:
-            raise Exception("Cant move to the same city")
+    def travel_to(self, to_city):
+        if self.current_city == to_city:
+            raise Exception("Cant travel to the same city")
 
+        self.current_city.referees.remove(self)
         self.timeline.append(to_city)
-        from_city.referees.remove(self)
         to_city.referees.append(self)
 
+    def undo_travel_to(self):
+        self.current_city.referees.remove(self)
+        self.timeline = self.timeline[:-1]
+        self.current_city.referees.append(self)  # current city now is the old (-1) city
+
     def move_home(self):
+        self.travel_to(self.home)
         self.resting = 1
         self.days_away = 0
-        self.move_city(self.timeline[-1], self.home)
 
-    # def move_back(self):
-    #     self.resting = 0
+    def assign_game(self, game, type):
+        if self.current_city != game.home.city:
+            raise Exception("Referee must be in the city")
 
-    def assign_game(self, game):
-        if self.city != game.home.city:  # if he needs to move
-            self.move_city(self.timeline[-1], game.home.city)
-        # self.days_away += 1
-        self.refdays.append(game.day)
-        self.refgames.append(game)
-        game.referees.append(self)
-        self.moved_yesterday = self.moved_today
-        self.moved_today = True
+        game.assign_ref(self, type)
 
-    def unassign_game(self, game):
-        print("unassign")
-        # recibe game, pero retrocede una ciudad, no elimina la ciudad de ese game :/
-        self.move_city(self.timeline[-1], self.timeline[-2])  # go back one city
-        self.timeline = self.timeline[:-2]  # delete last city (-2 item) and avoid duplicated city (-1 item)
-        # self.days_away -= 1
-        self.refdays.remove(game.day)
-        self.refgames.remove(game)
-        game.referees.remove(self)
-        self.moved_today = self.moved_yesterday
-        # self.moved_today = 0
+    def undo_assign_game(self, game, type):
+        game.undo_assign_ref(self, type)
+
+    def cost_to_game(self, game):
+        return self.current_city.flights[game.home.city]
 
 
 class NBA:
@@ -424,7 +467,7 @@ class NBA:
 
     def order_costs(self, game):
         refs = [r for r in self.referees.values()]
-        refs.sort(key=lambda x: int(x.city.flights[game.home.city]), reverse=False)
+        refs.sort(key=lambda x: x.cost_to_game(game), reverse=False)
         return refs
 
     def make_timeline(self):
@@ -490,6 +533,132 @@ def export():
         writer = csv.writer(output, lineterminator='\n')
         writer.writerows(data)
 
+class Backtrack:
+    def __init__(self, nba):
+        self.nba = nba
+        self.list_game_options = {}  # dict with {game: [options]}
+
+    def day_valid(self, day):
+        for game in self.nba.games[day]:
+            if not game.has_all_refs():
+                return False
+        return True
+
+    def all_options(self, game, referees_list):  # calculate all the referees options with its cost of a game
+        if game.has_all_refs():
+            refs = [ref.id for ref in game.referees]
+            self.list_game_options[game].append({"referees": refs, "cost": game.cost})
+            return True
+
+        for referee in referees_list:
+            if referee.is_valid(game):
+                game.add_cost(referee, "travel", referee.cost_to_game(game))
+
+                undo_travel = False
+                if referee.current_city != game.home.city:
+                    undo_travel = True
+                    referee.travel_to(game.home.city)
+                referee.assign_game(game, "type not defined yet")
+
+                self.all_options(game, referees_list)
+
+                if undo_travel:
+                    referee.undo_travel_to()
+                referee.undo_assign_game(game, "type not defined yet")
+                game.remove_cost(referee, "travel", referee.cost_to_game(game))
+
+        return False
+
+    def game_options(self, from_day, to_day, limit=None):
+        # returns all the combinations of referees on a range of days with it's total cost
+
+        if not (to_day >= from_day):
+            raise Exception("to_day ({}) must be equal or higher than from_day ({})".format(to_day, from_day))
+
+        games = [game for sublist in [nba.games[i] for i in range(from_day, to_day + 1)] for game in sublist]
+        city_games = list(set([game.home.city for game in games]))
+
+        for game in games:
+            self.list_game_options[game] = []
+
+            referee_list = self.nba.order_costs(game)[:limit]  # limitado a 'limit' arbitrariamente
+            self.all_options(game, referee_list)
+
+            self.list_game_options[game].sort(key=lambda x: x["cost"], reverse=False)
+
+        
+
+    def run(self, day):
+        if day >= 178:  # END CONDITION
+            return True
+
+        if day in self.nba.games:  # SOME DAYS DON'T HAVE GAMES
+            self.game_options(day, day, limit=30)
+
+            for game in self.nba.games[day]:
+                for option in self.list_game_options[game]:
+                    print(option)
+
+                    all_valid = True
+                    for ref_id in option["referees"]:
+                        ref = self.nba.referees[ref_id]
+                        if not ref.is_valid(game):
+                            all_valid = False
+                            break
+
+                    if all_valid:
+                        undo_travel = []
+                        for ref_id in option["referees"]:
+                            ref = self.nba.referees[ref_id]
+
+                            game.add_cost(ref, "travel", ref.cost_to_game(game))  # add cost before travel
+
+                            if ref.current_city != game.home.city:
+                                undo_travel.append(ref_id)
+                                ref.travel_to(game.home.city)
+                            ref.assign_game(game, "type not used yet")  # IF VALID: ASSIGN
+
+                        if self.run(day + 1):
+                            return True
+                        else:
+                            for ref_id in option["referees"]:
+                                ref = self.nba.referees[ref_id]
+
+                                if ref_id in undo_travel:
+                                    ref.undo_travel_to()
+                                ref.undo_assign_game(game, "type not defined yet")
+                                game.remove_cost(ref, "travel", ref.cost_to_game(game))
+
+                return False
+    '''
+        if day in nba.games:  # SOME DAYS DON'T HAVE GAMES
+            game = nba.games[day][num_game - 1]
+            refs = nba.order_costs(game)
+        else:
+            nba.update_all_refs()
+            return backtrack(nba, day + 1, 1)
+    
+        for ref in refs:
+            if ref.is_valid(game):
+                ref.assign_game(game)  # IF VALID: ASSIGN
+    
+                if not game.has_all_refs():
+                    if backtrack(nba, day, num_game):  # STAY ON THIS DAY and GAME
+                        return True
+                else:
+                    if num_game >= len(nba.games[day]):
+                        nba.update_all_refs()
+                        if backtrack(nba, day + 1, 1):  # IF LAST GAME, GO TO NEXT DAY
+                            return True
+                        # revert_all_refs();
+                    else:
+                        if backtrack(nba, day, num_game + 1):  # GO TO NEXT GAME
+                            return True
+    
+                ref.unassign_game(game)
+                # move ref back
+        return False
+    '''
 
 if __name__ == "__main__":
     nba = NBA()
@@ -502,6 +671,10 @@ if __name__ == "__main__":
     nba.seed_referees("datos/referees.csv")
     print("Seeds terminado")
 
+    bk = Backtrack(nba)
+    #bk.game_options(1, 1, limit=30)
+    bk.run(1)
+'''
     backtrack(nba, 1, 1)
 
     with open("games-days.txt", "w") as day_games:
@@ -530,3 +703,4 @@ if __name__ == "__main__":
                      "Cities: {2}\n".format(ref, len(set(ref.timeline)), set(map(lambda x: x.city, ref.timeline)))
             print(string)
             refs_info.write(string + "\n")
+'''
