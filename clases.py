@@ -266,17 +266,19 @@ class Referee:
         #return True
 
     def travel_to(self, to_city):
-        if self.current_city == to_city:
-            raise Exception("Cant travel to the same city")
+        if self.current_city != to_city:
+            self.current_city.referees.remove(self)
+            to_city.referees.append(self)
 
-        self.current_city.referees.remove(self)
         self.timeline.append(to_city)
-        to_city.referees.append(self)
 
     def undo_travel_to(self):
-        self.current_city.referees.remove(self)
+        old_city = self.current_city
         self.timeline = self.timeline[:-1]
-        self.current_city.referees.append(self)  # current city now is the old (-1) city
+
+        if self.current_city != old_city:
+            old_city.referees.remove(self)
+            self.current_city.referees.append(self)  # current city now is the old (-1) city
 
     def move_home(self):
         self.travel_to(self.home)
@@ -284,13 +286,14 @@ class Referee:
         self.days_away = 0
 
     def assign_game(self, game, type):
-        if self.current_city != game.home.city:
-            raise Exception("Referee must be in the city")
-
+        game.add_cost(self, "travel", self.cost_to_game(game))
+        self.travel_to(game.home.city)
         game.assign_ref(self, type)
 
     def undo_assign_game(self, game, type):
+        self.undo_travel_to()
         game.undo_assign_ref(self, type)
+        game.remove_cost(self, "travel", self.cost_to_game(game))
 
     def cost_to_game(self, game):
         return self.current_city.flights[game.home.city]
@@ -552,20 +555,9 @@ class Backtrack:
 
         for referee in referees_list:
             if referee.is_valid(game):
-                game.add_cost(referee, "travel", referee.cost_to_game(game))
-
-                undo_travel = False
-                if referee.current_city != game.home.city:
-                    undo_travel = True
-                    referee.travel_to(game.home.city)
                 referee.assign_game(game, "type not defined yet")
-
                 self.all_options(game, referees_list)
-
-                if undo_travel:
-                    referee.undo_travel_to()
                 referee.undo_assign_game(game, "type not defined yet")
-                game.remove_cost(referee, "travel", referee.cost_to_game(game))
 
         return False
 
@@ -586,79 +578,57 @@ class Backtrack:
 
             self.list_game_options[game].sort(key=lambda x: x["cost"], reverse=False)
 
-        
 
-    def run(self, day):
+
+    def run(self, day, num_game):
+        print("Day: {} Num_Game: {}".format(day, num_game))
+
         if day >= 178:  # END CONDITION
             return True
 
-        if day in self.nba.games:  # SOME DAYS DON'T HAVE GAMES
-            self.game_options(day, day, limit=30)
+        if day not in self.nba.games or num_game > len(nba.games[day]):  # SOME DAYS DON'T HAVE GAMES
+            print("Day don't have games or limit reached")
+            # update refs
+            if self.run(day + 1, 1):
+                return True
+            else:
+                #undo update refs
+                return False
+        else:
+            game = nba.games[day][num_game - 1]
 
-            for game in self.nba.games[day]:
-                for option in self.list_game_options[game]:
-                    print(option)
+            if game not in self.list_game_options:
+                self.game_options(day, day, limit=30)
 
-                    all_valid = True
+            for option in self.list_game_options[game]:
+                print(option)
+
+                all_valid = True
+                for ref_id in option["referees"]:
+                    ref = self.nba.referees[ref_id]
+                    if not ref.is_valid(game):
+                        all_valid = False
+                        break
+
+                if all_valid:
+                    print("Asigned: {}".format(option))
+
                     for ref_id in option["referees"]:
                         ref = self.nba.referees[ref_id]
-                        if not ref.is_valid(game):
-                            all_valid = False
-                            break
+                        ref.assign_game(game, "type not used yet")  # IF VALID: ASSIGN
 
-                    if all_valid:
-                        undo_travel = []
+                    if self.run(day, num_game + 1):
+                        return True
+                    else:
+                        print("Back")
                         for ref_id in option["referees"]:
                             ref = self.nba.referees[ref_id]
+                            ref.undo_assign_game(game, "type not defined yet")
 
-                            game.add_cost(ref, "travel", ref.cost_to_game(game))  # add cost before travel
-
-                            if ref.current_city != game.home.city:
-                                undo_travel.append(ref_id)
-                                ref.travel_to(game.home.city)
-                            ref.assign_game(game, "type not used yet")  # IF VALID: ASSIGN
-
-                        if self.run(day + 1):
-                            return True
-                        else:
-                            for ref_id in option["referees"]:
-                                ref = self.nba.referees[ref_id]
-
-                                if ref_id in undo_travel:
-                                    ref.undo_travel_to()
-                                ref.undo_assign_game(game, "type not defined yet")
-                                game.remove_cost(ref, "travel", ref.cost_to_game(game))
-
-                return False
-    '''
-        if day in nba.games:  # SOME DAYS DON'T HAVE GAMES
-            game = nba.games[day][num_game - 1]
-            refs = nba.order_costs(game)
-        else:
-            nba.update_all_refs()
-            return backtrack(nba, day + 1, 1)
-    
-        for ref in refs:
-            if ref.is_valid(game):
-                ref.assign_game(game)  # IF VALID: ASSIGN
-    
-                if not game.has_all_refs():
-                    if backtrack(nba, day, num_game):  # STAY ON THIS DAY and GAME
-                        return True
-                else:
-                    if num_game >= len(nba.games[day]):
-                        nba.update_all_refs()
-                        if backtrack(nba, day + 1, 1):  # IF LAST GAME, GO TO NEXT DAY
-                            return True
-                        # revert_all_refs();
-                    else:
-                        if backtrack(nba, day, num_game + 1):  # GO TO NEXT GAME
-                            return True
-    
-                ref.unassign_game(game)
-                # move ref back
+            return False
+            print("No more options")
         return False
-    '''
+
 
 if __name__ == "__main__":
     nba = NBA()
@@ -673,7 +643,7 @@ if __name__ == "__main__":
 
     bk = Backtrack(nba)
     #bk.game_options(1, 1, limit=30)
-    bk.run(1)
+    bk.run(1, 1)
 '''
     backtrack(nba, 1, 1)
 
