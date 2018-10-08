@@ -245,21 +245,26 @@ class Referee:
 
     def is_valid(self, game):
         if self in game.referees:  # it's already on the game
+            #print("on game")
             return False
 
         if self.last_day_refer > game.day:  # esto no deberia pasar, pero asi chequeamos que todo vaya bien
             raise Exception("There is an error. Last day refer {}, game day {}".format(self.last_day_refer, game.day))
 
         if self.last_day_refer == game.day:  # only can refer once a day
+            #print("one per day")
             return False
 
         if self.home == game.home.city:  # can't refer at home
+            #print("not at home")
             return False
 
         if self.current_city == self.home and 0 < self.resting < 3:  # if at home, it must rest at least 3 days
+            print("resting: {}".format(self.resting))
             return False
 
         if self.days_away > 4:  # can't be more than 4 days outside
+            print("days away")
             return False
 
         return game.can_assign_ref(self)
@@ -310,24 +315,26 @@ class NBA:
     def update_all_refs(self):
         refs = [r for r in self.referees.values()]
         for ref in refs:
-            ref.moved_today = False
-            if ref.resting:
+            if ref.resting > 0:
                 ref.resting += 1
-            if ref.days_away > 4:
-                ref.move_home()
-            if ref.city != ref.home:
+            if ref.current_city != ref.home:
                 ref.days_away += 1
+            else:
+                ref.timeline.append(ref.home)
+            if ref.days_away > 5:
+                ref.move_home()
             #ref.timeline.append(ref.city.id)
 
     def revert_all_refs(self):
         print("REEVEVVEERTTTT")
         refs = [r for r in self.referees.values()]
         for ref in refs:
-            ref.move_city(ref.timeline[-1], ref.timeline[-2])  # go back one city
-            ref.timeline = ref.timeline[:-2]  # delete last city (-2 item) and avoid duplicated city (-1 item)
-            #ref.timeline = ref.timeline[:-1]
-
-    #
+            if ref.resting > 0:
+                ref.resting -= 1
+            if ref.resting == 0:
+                ref.undo_travelto()
+            if ref.current_city != ref.home:
+                ref.days_away -= 1
 
     def pick_city(self, id, name):
         if name not in self.cities:
@@ -589,16 +596,17 @@ class Backtrack:
         if day not in self.nba.games or num_game > len(nba.games[day]):  # SOME DAYS DON'T HAVE GAMES
             print("Day don't have games or limit reached")
             # update refs
+            self.nba.update_all_refs()
             if self.run(day + 1, 1):
                 return True
             else:
-                #undo update refs
+                self.nba.revert_all_refs()
                 return False
         else:
             game = nba.games[day][num_game - 1]
 
             if game not in self.list_game_options:
-                self.game_options(day, day, limit=30)
+                self.game_options(day, day, limit=50)
 
             for option in self.list_game_options[game]:
                 print(option)
