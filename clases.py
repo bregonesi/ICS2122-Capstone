@@ -170,19 +170,29 @@ class Game:
         principales = 0
         colaboradores = 0
         for referee in self.referees + [ref]:
-            if "principal" in referee.type:  # use lowercase
+            if referee.type == "principal":  # use lowercase
                 principales += 1
-            if "colaborador" in referee.type:
+            if referee.type == "colaborador":
                 colaboradores += 1
+
+        for referee in self.referees + [ref]:
+            if referee.type == "principal y colaborador":  # use lowercase
+                if principales == 0:
+                    principales += 1
+                else:
+                    colaboradores += 1
 
         principales_limit = 1
         colaboradores_limit = 1
         if self.channel and self.channel.name == "ESPN":  # this combination must have 3 referees
             colaboradores_limit = 2
 
-        if principales >= principales_limit:
+        #print("channel: {} | principales: {} | colaboradores: {}".format(self.channel and self.channel.name, principales, colaboradores))
+
+        if principales > principales_limit:
             return False
-        if colaboradores >= colaboradores_limit:
+
+        if colaboradores > colaboradores_limit:
             return False
 
         return True  # if neither of the other, return True
@@ -194,10 +204,17 @@ class Game:
         principales = 0
         colaboradores = 0
         for referee in self.referees:
-            if "principal" in referee.type:  # use lowercase
+            if referee.type == "principal":  # use lowercase
                 principales += 1
-            if "colaborador" in referee.type:
+            if referee.type == "colaborador":
                 colaboradores += 1
+
+        for referee in self.referees:
+            if referee.type == "principal y colaborador":  # use lowercase
+                if principales == 0:
+                    principales += 1
+                else:
+                    colaboradores += 1
 
         if self.channel and self.channel.name == "ESPN":  # this combination must have 3 referees
             if len(self.referees) < 3:
@@ -260,11 +277,11 @@ class Referee:
             return False
 
         if self.current_city == self.home and 0 < self.resting < 3:  # if at home, it must rest at least 3 days
-            print("resting: {}".format(self.resting))
+            #print("resting: {}".format(self.resting))
             return False
 
         if self.days_away > 4:  # can't be more than 4 days outside
-            print("days away")
+            #print("days away")
             return False
 
         return game.can_assign_ref(self)
@@ -291,17 +308,37 @@ class Referee:
         self.days_away = 0
 
     def assign_game(self, game, type):
-        game.add_cost(self, "travel", self.cost_to_game(game))
+        game.add_cost(self, "travel_to_game", self.flight_cost_to_game(game))
         self.travel_to(game.home.city)
         game.assign_ref(self, type)
 
     def undo_assign_game(self, game, type):
         self.undo_travel_to()
         game.undo_assign_ref(self, type)
-        game.remove_cost(self, "travel", self.cost_to_game(game))
+        game.remove_cost(self, "travel_to_game", self.flight_cost_to_game(game))
+
+    def flight_cost_to_game(self, game):
+        return self.current_city.flights[game.home.city]
 
     def cost_to_game(self, game):
-        return self.current_city.flights[game.home.city]
+        flight_cost = self.flight_cost_to_game(game)
+
+        hotel_cost_current = self.current_city.hotel_cost
+        days_waiting = 0
+        if self.current_city != self.home:
+            days_waiting = game.day - self.refgames[-1].day
+            if game.day == 1:
+                print(self.id, days_waiting)
+
+        hotel_cost_game = game.home.city.hotel_cost
+
+        total_cost = flight_cost + hotel_cost_current * days_waiting + hotel_cost_game * 1
+
+        if 0:
+            if self.id in ["9"]:
+                print("{} {}: flight {} | hotel_current {} | days_waiting {} | hotel_game {} | total {}".format(game.day,
+                       self.id, flight_cost, hotel_cost_current, days_waiting, hotel_cost_game, total_cost))
+        return total_cost
 
 
 class NBA:
@@ -493,37 +530,6 @@ class NBA:
                     r.timeline.append("-")
 
 
-def backtrack(nba, day, num_game):
-    if day >= 178:  # END CONDITION
-        return True
-
-    if day in nba.games:  # SOME DAYS DON'T HAVE GAMES
-        game = nba.games[day][num_game - 1]
-        refs = nba.order_costs(game)
-    else:
-        nba.update_all_refs()
-        return backtrack(nba, day + 1, 1)
-
-    for ref in refs:
-        if ref.is_valid(game):
-            ref.assign_game(game)  # IF VALID: ASSIGN
-
-            if not game.has_all_refs():
-                if backtrack(nba, day, num_game):  # STAY ON THIS DAY and GAME
-                    return True
-            else:
-                if num_game >= len(nba.games[day]):
-                    nba.update_all_refs()
-                    if backtrack(nba, day + 1, 1):  # IF LAST GAME, GO TO NEXT DAY
-                        return True
-                    # revert_all_refs();
-                else:
-                    if backtrack(nba, day, num_game + 1):  # GO TO NEXT GAME
-                        return True
-
-            ref.unassign_game(game)
-            # move ref back
-    return False
 
 
 def export():
@@ -553,6 +559,14 @@ class Backtrack:
             if not game.has_all_refs():
                 return False
         return True
+
+    def set_referees(self, game):
+        referees = iter(self.nba.referees.values())
+        while not game.has_all_refs():
+            referee = next(referees)
+            if referee.is_valid(game):
+                referee.assign_game(game, "type not defined yet")
+
 
     def all_options(self, game, referees_list):  # calculate all the referees options with its cost of a game
         if game.has_all_refs():
@@ -587,7 +601,7 @@ class Backtrack:
 
 
 
-    def run(self, day, num_game):
+    def old_run(self, day, num_game):
         print("Day: {} Num_Game: {}".format(day, num_game))
 
         if day >= 178:  # END CONDITION
@@ -604,6 +618,8 @@ class Backtrack:
                 return False
         else:
             game = nba.games[day][num_game - 1]
+            self.set_referees(game)
+            return True
 
             if game not in self.list_game_options:
                 self.game_options(day, day, limit=50)
@@ -637,6 +653,73 @@ class Backtrack:
             print("No more options")
         return False
 
+    def run(self, day, num_game):
+        #print("day {}, numgame {}".format(day, num_game))
+        if day >= 178:  # 178: END CONDITION
+            return True
+
+        if day not in nba.games:  # SOME DAYS DON'T HAVE GAMES
+            self.nba.update_all_refs()
+            return self.run(day + 1, 1)
+
+        game = self.nba.games[day][num_game - 1]
+        refs = self.nba.order_costs(game)
+
+        valid = False
+        for ref in refs:
+            if ref.is_valid(game):
+                valid = True
+                ref.assign_game(game, "type")  # IF VALID: ASSIGN
+
+                if not game.has_all_refs():
+                    if self.run(day, num_game):  # STAY ON THIS DAY and GAME
+                        return True
+                else:
+                    if num_game >= len(nba.games[day]):  # IF LAST GAME
+                        self.nba.update_all_refs()
+                        if self.run(day + 1, 1):  # GO TO NEXT DAY
+                            return True
+                        print("revert refs")
+                        # revert_all_refs()
+                        #return False
+                    else:
+                        if self.run(day, num_game + 1):  # GO TO NEXT GAME
+                            return True
+                print("back")
+                return True
+                ref.undo_assign_game(game, "type")
+        print("no refs", valid)
+        return False
+
+def export_game_days(nba):
+    with open("games-days.txt", "w") as day_games:
+        for i in range(1, 178):
+            if i in nba.games:
+                day_str = "{0} DAY {1} {0}\n".format("-"*15, i)
+                print(day_str, end="")
+                day_games.write(day_str)
+
+                for g, game in enumerate(nba.games[i]):
+                    if not game.referees:
+                        return
+
+                    refs = [r.id for r in game.referees]
+
+                    string = "Game {}: {}; Channel: {}\n".format(g + 1, refs, game.channel and game.channel.name)
+                    print(string, end="")
+                    day_games.write(string)
+
+def export_refs_info(nba):
+    refs = [r for r in nba.referees.values()]
+    refs.sort(key=lambda x: len(set(x.timeline)), reverse=False)
+    with open("refs-info.txt", "w") as refs_info:
+        for ref in refs:
+            string = "ID: {0.id}\n" \
+                     "Home: {0.home.city_name}\n" \
+                     "Dif Cities: {1}\n" \
+                     "Cities: {2}\n\n".format(ref, len(set(ref.timeline)), set(map(lambda x: x.city, ref.timeline)))
+            print(string, end="")
+            refs_info.write(string)
 
 if __name__ == "__main__":
     nba = NBA()
@@ -652,33 +735,6 @@ if __name__ == "__main__":
     bk = Backtrack(nba)
     #bk.game_options(1, 1, limit=30)
     bk.run(1, 1)
-'''
-    backtrack(nba, 1, 1)
 
-    with open("games-days.txt", "w") as day_games:
-        for i in range(1, 178):
-            if i in nba.games:
-                print("--------- DAY " + str(i) + " -----------")
-                day_games.write("--------- DAY " + str(i) + " -----------\n")
-                g = 1
-                for game in nba.games[i]:
-                    refs = [r.id for r in game.referees]
-
-                    string = "Game {}: {}; Channel: {}".format(g, refs, game.channel and game.channel.name)
-                    print(string)
-                    day_games.write(string + "\n")
-
-                    g += 1
-    #export()
-
-    refs = [r for r in nba.referees.values()]
-    refs.sort(key=lambda x: len(set(x.timeline)), reverse=False)
-    with open("refs-info.txt", "w") as refs_info:
-        for ref in refs:
-            string = "ID: {0.id}\n" \
-                     "Home: {0.home.city_name}\n" \
-                     "Dif Cities: {1}\n" \
-                     "Cities: {2}\n".format(ref, len(set(ref.timeline)), set(map(lambda x: x.city, ref.timeline)))
-            print(string)
-            refs_info.write(string + "\n")
-'''
+    export_game_days(nba)
+    #export_refs_info(nba)
