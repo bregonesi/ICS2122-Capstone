@@ -239,8 +239,8 @@ class Referee:
         #self.city = city
         self.home.add_referee(self)
 
-        self.income = income
-        self.aditional_income = aditional_income
+        self.income = int(income)
+        self.aditional_income = int(aditional_income)
 
         self.resting = 0
         self.days_away = 0
@@ -321,25 +321,33 @@ class Referee:
         return self.current_city.flights[game.home.city]
 
     def cost_to_game(self, game):
-        flight_cost = self.flight_cost_to_game(game)
+        flight_cost_from = self.flight_cost_to_game(game)
 
         hotel_cost_current = self.current_city.hotel_cost
         days_waiting = 0
         if self.current_city != self.home:
-            days_waiting = game.day - self.refgames[-1].day
-            if game.day == 1:
-                print(self.id, days_waiting)
+            days_waiting = game.day - self.refgames[-1].day - 1
 
         hotel_cost_game = game.home.city.hotel_cost
 
-        total_cost = flight_cost + hotel_cost_current * days_waiting + hotel_cost_game * 1
+        flight_cost_to_home = game.home.city.flights[self.home]
 
-        if 0:
-            if self.id in ["9"]:
-                print("{} {}: flight {} | hotel_current {} | days_waiting {} | hotel_game {} | total {}".format(game.day,
-                       self.id, flight_cost, hotel_cost_current, days_waiting, hotel_cost_game, total_cost))
+        old_flight_cost_to_home = 0
+        if self.current_city != self.home:
+            old_flight_cost_to_home = self.current_city.flights[self.home]
+
+        total_cost = flight_cost_from + \
+                     (hotel_cost_current + self.aditional_income) * days_waiting + \
+                     (hotel_cost_game + self.aditional_income) * 1 + \
+                     flight_cost_to_home - \
+                     old_flight_cost_to_home
+
         return total_cost
 
+    def better_before(self, game):
+        hotel_cost_current = self.current_city.hotel_cost
+        hotel_cost_game = game.home.city.hotel_cost
+        return hotel_cost_game < hotel_cost_current and self.current_city != self.home
 
 class NBA:
     def __init__(self):
@@ -553,6 +561,8 @@ class Backtrack:
     def __init__(self, nba):
         self.nba = nba
         self.list_game_options = {}  # dict with {game: [options]}
+        self.assigned = 0
+        self.reused = 0
 
     def day_valid(self, day):
         for game in self.nba.games[day]:
@@ -598,8 +608,6 @@ class Backtrack:
             self.all_options(game, referee_list)
 
             self.list_game_options[game].sort(key=lambda x: x["cost"], reverse=False)
-
-
 
     def old_run(self, day, num_game):
         print("Day: {} Num_Game: {}".format(day, num_game))
@@ -656,6 +664,8 @@ class Backtrack:
     def run(self, day, num_game):
         #print("day {}, numgame {}".format(day, num_game))
         if day >= 178:  # 178: END CONDITION
+            print(self.reused)
+            print(self.assigned)
             return True
 
         if day not in nba.games:  # SOME DAYS DON'T HAVE GAMES
@@ -665,11 +675,19 @@ class Backtrack:
         game = self.nba.games[day][num_game - 1]
         refs = self.nba.order_costs(game)
 
-        valid = False
         for ref in refs:
             if ref.is_valid(game):
-                valid = True
+                if ref.refgames and ref.current_city != ref.home:
+                    self.reused += 1
+                    #print(game.day - ref.refgames[-1].day)
+
+                better_before = ref.better_before(game)
+                if better_before:
+                    pass
+                    #print("mejor mandarlo antes")
+
                 ref.assign_game(game, "type")  # IF VALID: ASSIGN
+                self.assigned += 1
 
                 if not game.has_all_refs():
                     if self.run(day, num_game):  # STAY ON THIS DAY and GAME
@@ -685,10 +703,10 @@ class Backtrack:
                     else:
                         if self.run(day, num_game + 1):  # GO TO NEXT GAME
                             return True
-                print("back")
-                return True
+
+                self.assigned -= 1
+                print("undo")
                 ref.undo_assign_game(game, "type")
-        print("no refs", valid)
         return False
 
 def export_game_days(nba):
@@ -736,5 +754,5 @@ if __name__ == "__main__":
     #bk.game_options(1, 1, limit=30)
     bk.run(1, 1)
 
-    export_game_days(nba)
+    #export_game_days(nba)
     #export_refs_info(nba)
