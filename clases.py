@@ -764,6 +764,33 @@ def export_refs_info(nba):
             print(string, end="")
             refs_info.write(string)
 
+def create_history(nba):
+    with open("history.csv", "w") as csvfile:
+
+        fieldnames = ['Ref ID'] + [i for i in range(1, 178)]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for id, ref in nba.referees.items():
+            write = {"Ref ID": id}
+
+            i_game = 0
+            for day in range(1, 178):
+                value = ""
+                if i_game < len(ref.refgames) and day == ref.refgames[i_game].day:
+                    value = "game"
+                    i_game += 1
+
+                if i_game + 1 < len(ref.refgames):
+                    dif = ref.refgames[i_game + 1].day - ref.refgames[i_game].day
+                    if 2 <= dif <= 3 and day > ref.refgames[i_game].day:
+                        value = "waiting"
+
+                write[day] = value
+
+            writer.writerow(write)
+
+
 if __name__ == "__main__":
     nba = NBA()
 
@@ -781,3 +808,4 @@ if __name__ == "__main__":
 
     #export_game_days(nba)
     #export_refs_info(nba)
+    create_history(nba)
