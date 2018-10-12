@@ -252,13 +252,24 @@ class Referee:
 
         self.timeline = [self.home]  # cities where it've been
 
+        self.seven_days_out = 1
+        self.four_days_out = 8
+
     @property
     def current_city(self):
         return self.timeline[-1]
 
     @property
     def last_day_refer(self):
-        return self.refgames[-1].day if len(self.refgames) else 0
+        return self.refgames[-1].day if self.refgames else 0
+
+    @property
+    def max_days_away(self):
+        if self.seven_days_out > 0:
+            return 7
+        elif self.four_days_out > 0:
+            return 4
+        return 3  # else
 
     def is_valid(self, game):
         if self in game.referees:  # it's already on the game
@@ -280,7 +291,7 @@ class Referee:
             #print("resting: {}".format(self.resting))
             return False
 
-        if self.days_away > 4:  # can't be more than 4 days outside
+        if self.days_away > self.max_days_away:  # can't be more than 4 days outside
             #print("days away")
             return False
 
@@ -326,7 +337,7 @@ class Referee:
         hotel_cost_current = self.current_city.hotel_cost
         days_waiting = 0
         if self.current_city != self.home:
-            days_waiting = game.day - self.refgames[-1].day - 1
+            days_waiting = game.day - self.last_day_refer - 1
 
         hotel_cost_game = game.home.city.hotel_cost
 
@@ -357,17 +368,31 @@ class NBA:
         self.games = {}  # dict with {[DATE] = [Games]}
         self.referees = {}  # dict with {[CODE] = Referee}
 
-    def update_all_refs(self):
-        refs = [r for r in self.referees.values()]
-        for ref in refs:
+    def update_all_refs(self, day):
+        for ref in self.referees.values():
             if ref.resting > 0:
                 ref.resting += 1
+
             if ref.current_city != ref.home:
                 ref.days_away += 1
-            else:
-                ref.timeline.append(ref.home)
-            if ref.days_away > 5:
+
+            if ref.current_city != ref.home and day - ref.last_day_refer >= 3:
+                # si estuvo mas de 3 dias sin arbitrar, mejor devolverlo el dia despues de arbitrar
+
+                gap = day - ref.last_day_refer
+                #print(gap)
+                #print("should return")
+                ref.move_home()  # lo movemos 'hoy'
+                ref.resting += gap - 1  # pero le sumamos 'resting' para simular que lo movimos hace dos dias
+
+            if ref.days_away >= ref.max_days_away:
+                if ref.days_away >= 7:
+                    ref.seven_days_out -= 1
+                elif ref.days_away >= 4:
+                    ref.four_days_out -= 1
+
                 ref.move_home()
+
             #ref.timeline.append(ref.city.id)
 
     def revert_all_refs(self):
@@ -669,7 +694,7 @@ class Backtrack:
             return True
 
         if day not in nba.games:  # SOME DAYS DON'T HAVE GAMES
-            self.nba.update_all_refs()
+            self.nba.update_all_refs(day)
             return self.run(day + 1, 1)
 
         game = self.nba.games[day][num_game - 1]
@@ -694,7 +719,7 @@ class Backtrack:
                         return True
                 else:
                     if num_game >= len(nba.games[day]):  # IF LAST GAME
-                        self.nba.update_all_refs()
+                        self.nba.update_all_refs(day)
                         if self.run(day + 1, 1):  # GO TO NEXT DAY
                             return True
                         print("revert refs")
