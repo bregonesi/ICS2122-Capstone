@@ -287,7 +287,7 @@ class Referee:
             #print("not at home")
             return False
 
-        if self.current_city == self.home and 0 < self.resting < 3:  # if at home, it must rest at least 3 days
+        if self.current_city == self.home and 0 < self.resting <= 3:  # if at home, it must rest at least 3 days
             #print("resting: {}".format(self.resting))
             return False
 
