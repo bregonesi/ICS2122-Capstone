@@ -110,11 +110,12 @@ class Game:
         self.costs = {}
 
     @property
-    def cost(self):
+    def total_cost(self):
         total_cost = 0
         for item in self.costs.values():
-            for entry in item.values():
-                total_cost = sum(entry)
+            for desc, entry in item.items():
+                if desc != "days_waiting":
+                    total_cost += sum(entry)
         return total_cost
 
     def add_cost(self, producer_key, detail_key, cost):
@@ -255,6 +256,8 @@ class Referee:
         self.seven_days_out = 1
         self.four_days_out = 8
 
+        self.costs = {}
+
     @property
     def current_city(self):
         return self.timeline[-1]
@@ -268,8 +271,38 @@ class Referee:
         if self.seven_days_out > 0:
             return 7
         elif self.four_days_out > 0:
-            return 4
+            return 6
         return 3  # else
+
+    @property
+    def total_cost(self):
+        total_cost = 0
+        for item in self.costs.values():
+            for entry in item.values():
+                total_cost += sum(entry)
+        return total_cost
+
+    def add_cost(self, producer_key, detail_key, cost):
+        cost = int(cost)
+
+        if producer_key not in self.costs:
+            self.costs[producer_key] = {}
+
+        if detail_key not in self.costs[producer_key]:
+            self.costs[producer_key][detail_key] = []
+
+        self.costs[producer_key][detail_key].append(cost)
+
+    def remove_cost(self, producer_key, detail_key, cost):
+        cost = int(cost)
+
+        self.costs[producer_key][detail_key].remove(cost)
+
+        if not self.costs[producer_key][detail_key]:
+            del self.costs[producer_key][detail_key]
+
+        if not self.costs[producer_key]:
+            del self.costs[producer_key]
 
     def is_valid(self, game):
         if self in game.referees:  # it's already on the game
@@ -295,6 +328,9 @@ class Referee:
             #print("days away")
             return False
 
+        #if self.id == "76":
+        #    print("Day: {}, away: {}, resting: {}, game_dec: {}".format(game.day, self.days_away, self.resting, game.can_assign_ref(self)))
+
         return game.can_assign_ref(self)
         #return True
 
@@ -313,20 +349,76 @@ class Referee:
             old_city.referees.remove(self)
             self.current_city.referees.append(self)  # current city now is the old (-1) city
 
-    def move_home(self):
+    def move_home(self, day):
+        gap = day - self.last_day_refer
+        self.days_away -= gap
+
+        #if self.id == "76":
+        #    print("Home day: {}, gap: {}, away: {}, max_away: {}, resting_before: {}".format(day, gap, self.days_away, self.max_days_away, self.resting))
+
+        if self.days_away >= 7:
+            self.seven_days_out -= 1
+        if self.days_away >= 4:
+            self.four_days_out -= 1
+
         self.travel_to(self.home)
         self.resting = 1
+
+        if gap > 0:
+            self.resting += gap - 1  # le sumamos 'resting' para simular que lo movimos hace gap
+
         self.days_away = 0
 
+        #if self.id == "76":
+        #    print("Resting_after: {}".format(self.resting))
+
+        last_game = self.refgames[-1]
+        last_game.add_cost(self, "flight_to_home_city", last_game.home.city.flights[self.home])
+        self.add_cost(last_game, "flight_to_home_city", last_game.home.city.flights[self.home])
+
     def assign_game(self, game, type):
-        game.add_cost(self, "travel_to_game", self.flight_cost_to_game(game))
+        game.add_cost(self, "flight_to_game_city", self.flight_cost_to_game(game))
+        self.add_cost(game, "flight_to_game_city", self.flight_cost_to_game(game))
+
+        days_waiting = 0
+        if self.current_city != self.home:
+            days_waiting = game.day - self.last_day_refer - 1
+
+        if days_waiting > 0:
+            game.add_cost(self, "days_waiting", days_waiting)
+            game.add_cost(self, "aditional_income_waiting", self.aditional_income * days_waiting)
+            game.add_cost(self, "hotel_waiting_city", self.current_city.hotel_cost * days_waiting)
+
+            self.add_cost(game, "days_waiting", days_waiting)
+            self.add_cost(game, "aditional_income_waiting", self.aditional_income * days_waiting)
+            self.add_cost(game, "hotel_waiting_city", self.current_city.hotel_cost * days_waiting)
+
+        game.add_cost(self, "aditional_income_refeering", self.aditional_income)
+        game.add_cost(self, "hotel_game_city", game.home.city.hotel_cost)
+        self.add_cost(game, "aditional_income_refeering", self.aditional_income)
+        self.add_cost(game, "hotel_game_city", game.home.city.hotel_cost)
+
         self.travel_to(game.home.city)
         game.assign_ref(self, type)
 
     def undo_assign_game(self, game, type):
         self.undo_travel_to()
         game.undo_assign_ref(self, type)
-        game.remove_cost(self, "travel_to_game", self.flight_cost_to_game(game))
+
+        game.remove_cost(self, "flight_to_game_city", self.flight_cost_to_game(game))
+
+        # esto no ha sido probado si esta funcionando
+        days_waiting = 0
+        if self.current_city != self.home:
+            days_waiting = game.day - self.last_day_refer - 1
+
+        if days_waiting > 0:
+            game.remove_cost(self, "days_waiting", days_waiting)
+            game.remove_cost(self, "aditional_income_waiting", self.aditional_income * days_waiting)
+            game.remove_cost(self, "hotel_waiting_city", self.current_city.hotel_cost * days_waiting)
+
+        game.remove_cost(self, "aditional_income_refeering", self.aditional_income)
+        game.remove_cost(self, "hotel_game_city", game.home.city.hotel_cost)
 
     def flight_cost_to_game(self, game):
         return self.current_city.flights[game.home.city]
@@ -379,19 +471,10 @@ class NBA:
             if ref.current_city != ref.home and day - ref.last_day_refer >= 3:
                 # si estuvo mas de 3 dias sin arbitrar, mejor devolverlo el dia despues de arbitrar
 
-                gap = day - ref.last_day_refer
-                #print(gap)
-                #print("should return")
-                ref.move_home()  # lo movemos 'hoy'
-                ref.resting += gap - 1  # pero le sumamos 'resting' para simular que lo movimos hace dos dias
+                ref.move_home(day)  # lo movemos 'hoy'
 
             if ref.days_away >= ref.max_days_away:
-                if ref.days_away >= 7:
-                    ref.seven_days_out -= 1
-                elif ref.days_away >= 4:
-                    ref.four_days_out -= 1
-
-                ref.move_home()
+                ref.move_home(day)
 
             #ref.timeline.append(ref.city.id)
 
@@ -405,6 +488,7 @@ class NBA:
                 ref.undo_travelto()
             if ref.current_city != ref.home:
                 ref.days_away -= 1
+        # remove if neccesary cost of 'flight_to_home_city'
 
     def pick_city(self, id, name):
         if name not in self.cities:
@@ -602,7 +686,6 @@ class Backtrack:
             if referee.is_valid(game):
                 referee.assign_game(game, "type not defined yet")
 
-
     def all_options(self, game, referees_list):  # calculate all the referees options with its cost of a game
         if game.has_all_refs():
             refs = [ref.id for ref in game.referees]
@@ -691,6 +774,11 @@ class Backtrack:
         if day >= 178:  # 178: END CONDITION
             print(self.reused)
             print(self.assigned)
+
+            for ref in nba.referees.values():
+                if ref.current_city != ref.home:
+                    ref.move_home(day)
+
             return True
 
         if day not in nba.games:  # SOME DAYS DON'T HAVE GAMES
@@ -748,7 +836,7 @@ def export_game_days(nba):
 
                     refs = [r.id for r in game.referees]
 
-                    string = "Game {}: {}; Channel: {}\n".format(g + 1, refs, game.channel and game.channel.name)
+                    string = "Game {}: {}; Channel: {}; Total cost: {}, Costs: {}\n".format(g + 1, refs, game.channel and game.channel.name, game.total_cost, game.costs)
                     print(string, end="")
                     day_games.write(string)
 
@@ -760,7 +848,9 @@ def export_refs_info(nba):
             string = "ID: {0.id}\n" \
                      "Home: {0.home.city_name}\n" \
                      "Dif Cities: {1}\n" \
-                     "Cities: {2}\n\n".format(ref, len(set(ref.timeline)), set(map(lambda x: x.city, ref.timeline)))
+                     "Cities: {2}\n" \
+                     "Costs: {0.costs}\n" \
+                     "Total cost: {0.total_cost}\n\n".format(ref, len(set(ref.timeline)), set(map(lambda x: x.city, ref.timeline)))
             print(string, end="")
             refs_info.write(string)
 
@@ -806,6 +896,6 @@ if __name__ == "__main__":
     #bk.game_options(1, 1, limit=30)
     bk.run(1, 1)
 
-    #export_game_days(nba)
-    #export_refs_info(nba)
+    export_game_days(nba)
+    export_refs_info(nba)
     create_history(nba)
