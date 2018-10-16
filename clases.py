@@ -1,11 +1,17 @@
 import datetime
 import csv
 import sys
+import pprint
 
 sys.setrecursionlimit(10000)
 from tabulate import tabulate
 import csv
 
+sum_days_away = 0
+count_days_away = 0
+count_one_days_away = 0
+count_fourplus_days_away = 0
+count_seven_days_away = 0
 
 class City:
     def __init__(self, id, city):
@@ -278,8 +284,9 @@ class Referee:
     def total_cost(self):
         total_cost = 0
         for item in self.costs.values():
-            for entry in item.values():
-                total_cost += sum(entry)
+            for desc, entry in item.items():
+                if desc != "days_waiting":
+                    total_cost += sum(entry)
         return total_cost
 
     def add_cost(self, producer_key, detail_key, cost):
@@ -350,16 +357,24 @@ class Referee:
             self.current_city.referees.append(self)  # current city now is the old (-1) city
 
     def move_home(self, day):
+        global sum_days_away, count_days_away, count_one_days_away, count_fourplus_days_away, count_seven_days_away
         gap = day - self.last_day_refer
         self.days_away -= gap
 
         #if self.id == "76":
         #    print("Home day: {}, gap: {}, away: {}, max_away: {}, resting_before: {}".format(day, gap, self.days_away, self.max_days_away, self.resting))
 
+        sum_days_away += self.days_away
+        count_days_away += 1
+
         if self.days_away >= 7:
             self.seven_days_out -= 1
+            count_seven_days_away += 1
         if self.days_away >= 4:
             self.four_days_out -= 1
+            count_fourplus_days_away += 1
+        if self.days_away == 1:
+            count_one_days_away += 1
 
         self.travel_to(self.home)
         self.resting = 1
@@ -777,6 +792,7 @@ class Backtrack:
 
             for ref in nba.referees.values():
                 if ref.current_city != ref.home:
+                    ref.days_away += 1  # for stats
                     ref.move_home(day)
 
             return True
@@ -823,6 +839,7 @@ class Backtrack:
         return False
 
 def export_game_days(nba):
+    season_total_cost = 0
     with open("games-days.txt", "w") as day_games:
         for i in range(1, 178):
             if i in nba.games:
@@ -837,12 +854,19 @@ def export_game_days(nba):
                     refs = [r.id for r in game.referees]
 
                     string = "Game {}: {}; Channel: {}; Total cost: {}, Costs: {}\n".format(g + 1, refs, game.channel and game.channel.name, game.total_cost, game.costs)
+                    season_total_cost += game.total_cost
+
                     print(string, end="")
                     day_games.write(string)
+
+        string = "Season total cost: {}\n".format(season_total_cost)
+        print(string, end="")
+        day_games.write(string)
 
 def export_refs_info(nba):
     refs = [r for r in nba.referees.values()]
     refs.sort(key=lambda x: len(set(x.timeline)), reverse=False)
+    season_total_cost = 0
     with open("refs-info.txt", "w") as refs_info:
         for ref in refs:
             string = "ID: {0.id}\n" \
@@ -851,8 +875,13 @@ def export_refs_info(nba):
                      "Cities: {2}\n" \
                      "Costs: {0.costs}\n" \
                      "Total cost: {0.total_cost}\n\n".format(ref, len(set(ref.timeline)), set(map(lambda x: x.city, ref.timeline)))
+            season_total_cost += ref.total_cost
             print(string, end="")
             refs_info.write(string)
+
+        string = "Season total cost: {}\n".format(season_total_cost)
+        print(string, end="")
+        refs_info.write(string)
 
 def create_history(nba):
     with open("history.csv", "w") as csvfile:
@@ -865,15 +894,17 @@ def create_history(nba):
             write = {"Ref ID": id}
 
             i_game = 0
+            home = True
             for day in range(1, 178):
                 value = ""
                 if i_game < len(ref.refgames) and day == ref.refgames[i_game].day:
-                    value = "game"
+                    #value = "game"
+                    value = ref.refgames[i_game].home.city.city_name
                     i_game += 1
 
-                if i_game + 1 < len(ref.refgames):
-                    dif = ref.refgames[i_game + 1].day - ref.refgames[i_game].day
-                    if 2 <= dif <= 3 and day > ref.refgames[i_game].day:
+                if i_game < len(ref.refgames):
+                    dif = ref.refgames[i_game].day - ref.refgames[i_game - 1].day
+                    if 1 < dif <= 3 and day > ref.refgames[i_game - 1].day:
                         value = "waiting"
 
                 write[day] = value
@@ -899,3 +930,10 @@ if __name__ == "__main__":
     export_game_days(nba)
     export_refs_info(nba)
     create_history(nba)
+
+    print("Stats")
+    print("Avg days out {}".format(sum_days_away / count_days_away))
+    print("Count times out {}".format(count_days_away))
+    print("Times one day out {}".format(count_one_days_away))
+    print("Times four+ day out {}".format(count_fourplus_days_away))
+    print("Times seven day out {}".format(count_seven_days_away))
