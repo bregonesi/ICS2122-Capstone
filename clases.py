@@ -124,6 +124,16 @@ class Game:
                     total_cost += sum(entry)
         return total_cost
 
+    @property
+    def costs_pretty(self):
+        pp = pprint.PrettyPrinter(indent=4)
+        pretty = {}
+
+        for ref, desc in self.costs.items():
+            pretty[ref.id] = desc
+
+        return pp.pformat(pretty)
+
     def add_cost(self, producer_key, detail_key, cost):
         cost = int(cost)
 
@@ -288,6 +298,16 @@ class Referee:
                 if desc != "days_waiting":
                     total_cost += sum(entry)
         return total_cost
+
+    @property
+    def costs_pretty(self):
+        pp = pprint.PrettyPrinter(indent=4)
+        pretty = {}
+
+        for game, desc in self.costs.items():
+            pretty[game.day] = desc
+
+        return pp.pformat(pretty)
 
     def add_cost(self, producer_key, detail_key, cost):
         cost = int(cost)
@@ -853,7 +873,8 @@ def export_game_days(nba):
 
                     refs = [r.id for r in game.referees]
 
-                    string = "Game {}: {}; Channel: {}; Total cost: {}, Costs: {}\n".format(g + 1, refs, game.channel and game.channel.name, game.total_cost, game.costs)
+                    string = "Game {}: {}; Channel: {}; Total cost: {}, Costs:\n" \
+                             "{}\n\n".format(g + 1, refs, game.channel and game.channel.name, game.total_cost, game.costs_pretty)
                     season_total_cost += game.total_cost
 
                     print(string, end="")
@@ -871,10 +892,16 @@ def export_refs_info(nba):
         for ref in refs:
             string = "ID: {0.id}\n" \
                      "Home: {0.home.city_name}\n" \
+                     "Aditional income: {0.aditional_income}\n" \
                      "Dif Cities: {1}\n" \
                      "Cities: {2}\n" \
-                     "Costs: {0.costs}\n" \
-                     "Total cost: {0.total_cost}\n\n".format(ref, len(set(ref.timeline)), set(map(lambda x: x.city, ref.timeline)))
+                     "Total Cost: {0.total_cost}\n" \
+                     "Average cost: {3}\n" \
+                     "Costs:\n" \
+                     "{0.costs_pretty}\n\n".format(ref,
+                                                   len(set(ref.timeline)),
+                                                   set(map(lambda x: x.city, ref.timeline)),
+                                                   ref.total_cost / len(ref.refgames) if ref.refgames else "-")
             season_total_cost += ref.total_cost
             print(string, end="")
             refs_info.write(string)
@@ -935,5 +962,5 @@ if __name__ == "__main__":
     print("Avg days out {}".format(sum_days_away / count_days_away))
     print("Count times out {}".format(count_days_away))
     print("Times one day out {}".format(count_one_days_away))
-    print("Times four+ day out {}".format(count_fourplus_days_away))
-    print("Times seven day out {}".format(count_seven_days_away))
+    print("Times four+ days out {}".format(count_fourplus_days_away))
+    print("Times seven days out {}".format(count_seven_days_away))
