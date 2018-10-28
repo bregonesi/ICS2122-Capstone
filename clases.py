@@ -114,6 +114,7 @@ class Game:
             self.channel.add_game(self)
 
         self.costs = {}
+        self.valid_referees = None
 
     @property
     def total_cost(self):
@@ -155,6 +156,13 @@ class Game:
 
         if not self.costs[producer_key]:
             del self.costs[producer_key]
+
+    def set_valid_referees(self, referee_list):
+        c = 0
+        for ref in referee_list:
+            if ref.is_valid(self):
+                c += 1
+        self.valid_referees = c
 
     def assign_ref(self, ref, type):
         if self.has_all_refs():
@@ -824,6 +832,9 @@ class Backtrack:
         game = self.nba.games[day][num_game - 1]
         refs = self.nba.order_costs(game)
 
+        if game.valid_referees == None:
+            game.set_valid_referees(refs)
+
         for ref in refs:
             if ref.is_valid(game):
                 if ref.refgames and ref.current_city != ref.home:
@@ -873,8 +884,8 @@ def export_game_days(nba):
 
                     refs = [r.id for r in game.referees]
 
-                    string = "Game {}: {}; Channel: {}; Total cost: {}, Costs:\n" \
-                             "{}\n\n".format(g + 1, refs, game.channel and game.channel.name, game.total_cost, game.costs_pretty)
+                    string = "Game {}: {}; Channel: {}; Valid refs: {}, Total cost: {}, Costs:\n" \
+                             "{}\n\n".format(g + 1, refs, game.channel and game.channel.name, game.valid_referees, game.total_cost, game.costs_pretty)
                     season_total_cost += game.total_cost
 
                     print(string, end="")
