@@ -894,14 +894,16 @@ def export_refs_info(nba):
                      "Home: {0.home.city_name}\n" \
                      "Aditional income: {0.aditional_income}\n" \
                      "Dif Cities: {1}\n" \
+                     "Dif Games: {4}\n" \
                      "Cities: {2}\n" \
                      "Total Cost: {0.total_cost}\n" \
-                     "Average cost: {3}\n" \
+                     "Average cost (dividido en numero de games): {3}\n" \
                      "Costs:\n" \
                      "{0.costs_pretty}\n\n".format(ref,
                                                    len(set(ref.timeline)),
                                                    set(map(lambda x: x.city, ref.timeline)),
-                                                   ref.total_cost / len(ref.refgames) if ref.refgames else "-")
+                                                   ref.total_cost / len(ref.refgames) if ref.refgames else "-",
+                                                   len(set(ref.refgames)))
             season_total_cost += ref.total_cost
             print(string, end="")
             refs_info.write(string)
@@ -938,6 +940,21 @@ def create_history(nba):
 
             writer.writerow(write)
 
+def days_out_stats():
+    global sum_days_away, count_days_away, count_one_days_away, count_fourplus_days_away, count_seven_days_away
+    string = "Stats\n" \
+             "Avg days out {}\n" \
+             "Times one day out {}\n" \
+             "Times four+ days out {}\n" \
+             "Times seven days out {}\n".format(sum_days_away / count_days_away,
+                                              count_days_away,
+                                              count_one_days_away,
+                                              count_fourplus_days_away,
+                                              count_seven_days_away)
+    with open("stats.txt", "w") as file:
+        file.write(string)
+        print(string)
+
 
 if __name__ == "__main__":
     nba = NBA()
@@ -957,10 +974,5 @@ if __name__ == "__main__":
     export_game_days(nba)
     export_refs_info(nba)
     create_history(nba)
+    days_out_stats()
 
-    print("Stats")
-    print("Avg days out {}".format(sum_days_away / count_days_away))
-    print("Count times out {}".format(count_days_away))
-    print("Times one day out {}".format(count_one_days_away))
-    print("Times four+ days out {}".format(count_fourplus_days_away))
-    print("Times seven days out {}".format(count_seven_days_away))
