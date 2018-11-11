@@ -355,6 +355,9 @@ class Referee:
             #print("not at home")
             return False
 
+        if self.home == game.away.city:  # can't refer home teams
+            return False
+
         if self.current_city == self.home and 0 < self.resting <= 3:  # if at home, it must rest at least 3 days
             #print("resting: {}".format(self.resting))
             return False
@@ -512,7 +515,7 @@ class NBA:
                 ref.days_away += 1
 
             if ref.current_city != ref.home and day - ref.last_day_refer >= 3:
-                # si estuvo mas de 3 dias sin arbitrar, mejor devolverlo el dia despues de arbitrar
+                # si estuvo mas de 2 dias sin arbitrar, al 3ro es mejor devolverlo el dia despues de arbitrar
 
                 ref.move_home(day)  # lo movemos 'hoy'
 
@@ -871,7 +874,7 @@ class Backtrack:
 
 def export_game_days(nba):
     season_total_cost = 0
-    with open("games-days.txt", "w") as day_games:
+    with open("resultados/games-days.txt", "w") as day_games:
         for i in range(1, 178):
             if i in nba.games:
                 day_str = "{0} DAY {1} {0}\n".format("-"*15, i)
@@ -895,11 +898,31 @@ def export_game_days(nba):
         print(string, end="")
         day_games.write(string)
 
+def export_game_days_csv(nba):
+    with open("resultados/games-days-csv.csv", "w") as csvfile:
+
+        fieldnames = ['Game ID', 'Day', 'Channel', '#Valid refs', 'Total cost']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for i in range(1, 178):
+            if i in nba.games:
+                for g, game in enumerate(nba.games[i]):
+                    if not game.referees:
+                        return
+                    write = {"Game ID": g + 1,
+                             "Day": i,
+                             "Channel": game.channel and game.channel.name,
+                             "#Valid refs": game.valid_referees,
+                             "Total cost": game.total_cost}
+                    print(write)
+                    writer.writerow(write)
+
 def export_refs_info(nba):
     refs = [r for r in nba.referees.values()]
     refs.sort(key=lambda x: len(set(x.timeline)), reverse=False)
     season_total_cost = 0
-    with open("refs-info.txt", "w") as refs_info:
+    with open("resultados/refs-info.txt", "w") as refs_info:
         for ref in refs:
             string = "ID: {0.id}\n" \
                      "Home: {0.home.city_name}\n" \
@@ -923,8 +946,28 @@ def export_refs_info(nba):
         print(string, end="")
         refs_info.write(string)
 
+def export_refs_info_csv(nba):
+    refs = [r for r in nba.referees.values()]
+    refs.sort(key=lambda x: len(set(x.timeline)), reverse=False)
+    with open("resultados/refs-info-csv.csv", "w") as csvfile:
+
+        fieldnames = ['Ref ID', 'Home', 'Aditional Income', '#Cities', '#Games', 'Avg cost', 'Total cost']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for ref in refs:
+            write = {"Ref ID": ref.id,
+                     "Home": ref.home.city_name,
+                     "Aditional Income": ref.aditional_income,
+                     "#Cities": len(set(ref.timeline)),
+                     "#Games": len(set(ref.refgames)),
+                     "Avg cost": round(ref.total_cost / len(ref.refgames), 2) if ref.refgames else 0,
+                     "Total cost": ref.total_cost}
+            writer.writerow(write)
+
+
 def create_history(nba):
-    with open("history.csv", "w") as csvfile:
+    with open("resultados/history.csv", "w") as csvfile:
 
         fieldnames = ['Ref ID'] + [i for i in range(1, 178)]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -962,7 +1005,7 @@ def days_out_stats():
                                               count_one_days_away,
                                               count_fourplus_days_away,
                                               count_seven_days_away)
-    with open("stats.txt", "w") as file:
+    with open("resultados/stats.txt", "w") as file:
         file.write(string)
         print(string)
 
@@ -983,7 +1026,9 @@ if __name__ == "__main__":
     bk.run(1, 1)
 
     export_game_days(nba)
+    export_game_days_csv(nba)
     export_refs_info(nba)
+    export_refs_info_csv(nba)
     create_history(nba)
     days_out_stats()
 
