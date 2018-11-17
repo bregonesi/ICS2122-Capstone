@@ -512,20 +512,8 @@ class Referee:
         self.undo_travel_to()
         game.undo_assign_ref(self, type)
 
-        game.remove_cost(self, "flight_to_game_city", self.flight_cost_to_game(game))
-
-        # esto no ha sido probado si esta funcionando
-        days_waiting = 0
-        if self.current_city != self.home:
-            days_waiting = game.day - self.last_day_refer - 1
-
-        if days_waiting > 0:
-            game.remove_cost(self, "days_waiting", days_waiting)
-            game.remove_cost(self, "aditional_income_waiting", self.aditional_income * days_waiting)
-            game.remove_cost(self, "hotel_waiting_city", self.current_city.hotel_cost * days_waiting)
-
-        game.remove_cost(self, "aditional_income_refeering", self.aditional_income)
-        game.remove_cost(self, "hotel_game_city", game.home.city.hotel_cost)
+        del self.costs[game]
+        del game.costs[self]
 
     def flight_cost_to_game(self, game):
         return self.current_city.flights[game.home.city]
