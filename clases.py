@@ -167,7 +167,7 @@ class Game:
                 c += 1
         self.valid_referees = c
 
-    def assign_ref(self, ref, type):
+    def assign_ref(self, ref):
         if self.has_all_refs():
             raise Exception("All refs are assigned to this game {}".format(vars(self)))
 
@@ -180,7 +180,7 @@ class Game:
         self.referees.append(ref)
         ref.refgames.append(self)
 
-    def undo_assign_ref(self, ref, type):
+    def undo_assign_ref(self, ref):
         self.referees.remove(ref)
         ref.refgames.remove(self)
 
@@ -532,7 +532,7 @@ class Referee:
         print(self.resting - 1)
         '''
 
-    def assign_game(self, game, type):
+    def assign_game(self, game):
         game.add_cost(self, "flight_to_game_city", self.flight_cost_to_game(game))
         self.add_cost(game, "flight_to_game_city", self.flight_cost_to_game(game))
 
@@ -555,11 +555,11 @@ class Referee:
         self.add_cost(game, "hotel_game_city", game.home.city.hotel_cost)
 
         self.travel_to(game.home.city)
-        game.assign_ref(self, type)
+        game.assign_ref(self)
 
-    def undo_assign_game(self, game, type):
+    def undo_assign_game(self, game):
         self.undo_travel_to()
-        game.undo_assign_ref(self, type)
+        game.undo_assign_ref(self)
 
         del self.costs[game]
         del game.costs[self]
@@ -567,7 +567,7 @@ class Referee:
     def flight_cost_to_game(self, game):
         return self.current_city.flights[game.home.city]
 
-    def cost_to_game(self, game):
+    def cost_to_game(self, game, nba):
         flight_cost_from = self.flight_cost_to_game(game)
 
         hotel_cost_current = self.current_city.hotel_cost
@@ -583,11 +583,19 @@ class Referee:
         if self.current_city != self.home:
             old_flight_cost_to_home = self.current_city.flights[self.home]
 
+        costo_de_sacarlo_de_ciudad_mismo_dia = 0
+        for nba_game in nba.games[game.day]:
+            if game != nba_game and nba_game.home.city == self.current_city and game.home.city != nba_game.home.city and self.is_valid(nba_game):
+                costo_de_sacarlo_de_ciudad_mismo_dia += self.current_city.flights[game.home.city]
+                costo_de_sacarlo_de_ciudad_mismo_dia += game.home.city.flights[self.current_city]
+
         total_cost = flight_cost_from + \
                      (hotel_cost_current + self.aditional_income) * days_waiting + \
                      (hotel_cost_game + self.aditional_income) * 1 + \
                      flight_cost_to_home - \
-                     old_flight_cost_to_home
+                     old_flight_cost_to_home + \
+                     costo_de_sacarlo_de_ciudad_mismo_dia
+
 
         return total_cost
 
@@ -630,7 +638,6 @@ class NBA:
 
             if ref.days_away >= ref.max_days_away:
                 ref.move_home(day)
-
 
     def revert_all_refs(self, day):
         for ref in self.referees.values():
@@ -817,7 +824,7 @@ class NBA:
 
     def order_costs(self, game):
         refs = [r for r in self.referees.values()]
-        refs.sort(key=lambda x: x.cost_to_game(game), reverse=False)
+        refs.sort(key=lambda x: x.cost_to_game(game, self), reverse=False)
         return refs
 
     def make_timeline(self):
@@ -875,7 +882,7 @@ class Backtrack:
     def all_options(self, game, referees_list):  # calculate all the referees options with its cost of a game
         if game.has_all_refs():
             refs = [ref.id for ref in game.referees]
-            self.list_game_options[game].append({"referees": refs, "cost": game.cost})
+            self.list_game_options[game].append({"referees": refs, "cost": game.total_cost})
             return True
 
         for referee in referees_list:
@@ -993,7 +1000,7 @@ class Backtrack:
                     pass
                     #print("mejor mandarlo antes")
 
-                ref.assign_game(game, "type")  # IF VALID: ASSIGN
+                ref.assign_game(game)  # IF VALID: ASSIGN
                 self.assigned += 1
 
                 if not game.has_all_refs():
@@ -1016,8 +1023,8 @@ class Backtrack:
                             return True
 
                 self.assigned -= 1
-                print("undo")
-                ref.undo_assign_game(game, "type")
+                #print("undo")
+                ref.undo_assign_game(game)
         return False
 
 def export_game_days(nba):
@@ -1172,7 +1179,10 @@ if __name__ == "__main__":
     print("Seeds terminado")
 
     bk = Backtrack(nba)
-    #bk.game_options(1, 1, limit=30)
+    #bk.game_options(2, 2, limit=30)
+
+    #pp = pprint.PrettyPrinter(indent=4)
+    #print(pp.pformat(bk.list_game_options))
     bk.run(1, 1)
 
     export_game_days(nba)
