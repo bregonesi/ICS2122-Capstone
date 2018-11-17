@@ -478,36 +478,59 @@ class Referee:
         self.add_cost(last_game, "flight_to_home_city", last_game.home.city.flights[self.home])
 
     def undo_move_home(self, day):
-        print("undo id {}".format(self.id))
+        #print("undo id {}\n{}".format(self.id, vars(self)))
 
-        days_out = 0
+        i = 0
         for city in list(reversed(self.timeline[:-1])):
-            days_out += 1
             if city == self.home:
                 break
-        days_waiting = day - 1 - self.last_day_refer
-        print("days out {} | days waiting {}".format(days_out, days_waiting))
-        self.days_away = days_out
+            i += 1
+        days_working = self.refgames[-1].day - self.refgames[-i].day + 1
+        days_waiting = day - self.last_day_refer
+        #print("days working {} | days waiting {}".format(days_working, days_waiting))
+        self.days_away = days_working + days_waiting
 
-        #if self.days_away >= 7:
-        #    self.seven_days_out += 1
-        #if self.days_away >= 4:
-        #    self.four_days_out += 1
+        if days_working >= 7:
+            self.seven_days_out += 1
+        if days_working >= 4:
+            self.four_days_out += 1
 
-        gap = day - 1 - self.last_day_refer
-        self.days_away += gap
+        self.resting = 0
 
-        if self.days_away >= self.max_days_away:
-            self.resting = day - self.days_away
-            print(self.resting)
+        if self.days_away > self.max_days_away:
             self.days_away = 0
+            self.resting = days_waiting
+            if days_working >= 7:
+                self.seven_days_out -= 1
+            if days_working >= 4:
+                self.four_days_out -= 1
         else:
             self.undo_travel_to()
-            self.resting = 0
+        '''
+        #gap = day - 1 - self.last_day_refer
+        #self.days_away += gap
+
+        if self.days_away > 7:
+            self.resting = day - self.last_day_refer
+            self.days_away = 0
+        else:
+        #if days_waiting >= 3 or self.days_away >= 7:
+            self.undo_travel_to()
+            self.resting = max(days_waiting - 3, 1)
+
+            if days_working >= 7:
+                self.seven_days_out += 1
+            if days_working >= 4:
+                self.four_days_out += 1
 
             last_game = self.refgames[-1]
             last_game.remove_cost(self, "flight_to_home_city", last_game.home.city.flights[self.home])
             self.remove_cost(last_game, "flight_to_home_city", last_game.home.city.flights[self.home])
+        #else:# self.days_away >= self.max_days_away:
+
+        print(self.days_away - 1)
+        print(self.resting - 1)
+        '''
 
     def assign_game(self, game, type):
         game.add_cost(self, "flight_to_game_city", self.flight_cost_to_game(game))
@@ -611,7 +634,7 @@ class NBA:
 
     def revert_all_refs(self, day):
         for ref in self.referees.values():
-            if ref.current_city == ref.home and day - ref.last_day_refer <= 3:
+            if ref.current_city == ref.home and day - ref.last_day_refer <= 3 and ref.resting <= 3:
                 ref.undo_move_home(day)
             '''
             if ref.current_city == ref.home and ref.refgames and \
@@ -981,29 +1004,12 @@ class Backtrack:
 
                     if num_game >= len(nba.games[day]):  # IF LAST GAME
 
-                        if day == 12:
-                            pp = pprint.PrettyPrinter(indent=4)
-                            pretty = {id: i.debug() for id, i in nba.referees.items()}
-                            with open("before.txt", "w") as f:
-                                f.write(pp.pformat(pretty))
                         self.nba.update_all_refs(day)
-                        if day == 12:
-                            pp = pprint.PrettyPrinter(indent=4)
-                            pretty = {id: i.debug() for id, i in nba.referees.items()}
-                            with open("after.txt", "w") as f:
-                                f.write(pp.pformat(pretty))
-
-                            nba.revert_all_refs(day)
-                            pp = pprint.PrettyPrinter(indent=4)
-                            pretty = {id: i.debug() for id, i in nba.referees.items()}
-                            with open("revert.txt", "w") as f:
-                                f.write(pp.pformat(pretty))
-                            exit(0)
 
                         if self.run(day + 1, 1):  # GO TO NEXT DAY
                             return True
-                        print("revert refs")
-                        # revert_all_refs()
+
+                        self.nba.update_all_refs(day)
                         #return False
                     else:
                         if self.run(day, num_game + 1):  # GO TO NEXT GAME
