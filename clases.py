@@ -307,7 +307,7 @@ class Referee:
         self.income = int(income)
         self.aditional_income = int(aditional_income)
 
-        self.resting = 0
+        self.resting = 4
         self.days_away = 0
 
         self.moved_today = False
@@ -415,7 +415,7 @@ class Referee:
         if self.home == game.away.city:  # can't refer home teams
             return False
 
-        if self.current_city == self.home and 0 < self.resting <= 3:  # if at home, it must rest at least 3 days
+        if self.current_city == self.home and self.resting <= 3:  # if at home, it must rest at least 3 days
             #print("resting: {}".format(self.resting))
             return False
 
@@ -453,9 +453,6 @@ class Referee:
         gap = day - self.last_day_refer
         self.days_away -= gap
 
-        #if self.id == "76":
-        #    print("Home day: {}, gap: {}, away: {}, max_away: {}, resting_before: {}".format(day, gap, self.days_away, self.max_days_away, self.resting))
-
         sum_days_away += self.days_away
         count_days_away += 1
 
@@ -476,12 +473,41 @@ class Referee:
 
         self.days_away = 0
 
-        #if self.id == "76":
-        #    print("Resting_after: {}".format(self.resting))
-
         last_game = self.refgames[-1]
         last_game.add_cost(self, "flight_to_home_city", last_game.home.city.flights[self.home])
         self.add_cost(last_game, "flight_to_home_city", last_game.home.city.flights[self.home])
+
+    def undo_move_home(self, day):
+        print("undo id {}".format(self.id))
+
+        days_out = 0
+        for city in list(reversed(self.timeline[:-1])):
+            days_out += 1
+            if city == self.home:
+                break
+        days_waiting = day - 1 - self.last_day_refer
+        print("days out {} | days waiting {}".format(days_out, days_waiting))
+        self.days_away = days_out
+
+        #if self.days_away >= 7:
+        #    self.seven_days_out += 1
+        #if self.days_away >= 4:
+        #    self.four_days_out += 1
+
+        gap = day - 1 - self.last_day_refer
+        self.days_away += gap
+
+        if self.days_away >= self.max_days_away:
+            self.resting = day - self.days_away
+            print(self.resting)
+            self.days_away = 0
+        else:
+            self.undo_travel_to()
+            self.resting = 0
+
+            last_game = self.refgames[-1]
+            last_game.remove_cost(self, "flight_to_home_city", last_game.home.city.flights[self.home])
+            self.remove_cost(last_game, "flight_to_home_city", last_game.home.city.flights[self.home])
 
     def assign_game(self, game, type):
         game.add_cost(self, "flight_to_game_city", self.flight_cost_to_game(game))
@@ -547,6 +573,16 @@ class Referee:
         hotel_cost_game = game.home.city.hotel_cost
         return hotel_cost_game < hotel_cost_current and self.current_city != self.home
 
+    def debug(self):
+        return {"id": self.id,
+                "days_away": self.days_away,
+                "resting": self.resting,
+                "seven_days_out": self.seven_days_out,
+                "four_days_out": self.four_days_out,
+                "home": self.home.city,
+                "refgames": [[i.day, i.home.city.city] for i in self.refgames],
+                "timeline": [i.city for i in self.timeline]}
+
 class NBA:
     def __init__(self):
         self.cities = {}  # dict with {[NAME] = City}
@@ -557,10 +593,11 @@ class NBA:
 
     def update_all_refs(self, day):
         for ref in self.referees.values():
-            if ref.resting > 0:
+            if ref.current_city == ref.home:
                 ref.resting += 1
-
-            if ref.current_city != ref.home:
+                ref.days_away = 0
+            else:
+                ref.resting = 0
                 ref.days_away += 1
 
             if ref.current_city != ref.home and day - ref.last_day_refer >= 3:
@@ -571,19 +608,50 @@ class NBA:
             if ref.days_away >= ref.max_days_away:
                 ref.move_home(day)
 
-            #ref.timeline.append(ref.city.id)
 
-    def revert_all_refs(self):
-        print("REEVEVVEERTTTT")
-        refs = [r for r in self.referees.values()]
-        for ref in refs:
+    def revert_all_refs(self, day):
+        for ref in self.referees.values():
+            if ref.current_city == ref.home and day - ref.last_day_refer <= 3:
+                ref.undo_move_home(day)
+            '''
+            if ref.current_city == ref.home and ref.refgames and \
+                    ref.resting == 3 and ref.days_away == 0:  # justo se fue a la casa
+                #print("{}".format(vars(ref)))
+                ref.undo_travel_to()
+
+                last_game = ref.refgames[-1]
+                last_game.remove_cost(ref, "flight_to_home_city", last_game.home.city.flights[ref.home])
+                ref.remove_cost(last_game, "flight_to_home_city", last_game.home.city.flights[ref.home])
+
+                ref.resting = 0
+
+                days_out = 0
+                for city in ref.timeline[::-1]:
+                    days_out += 1
+                    if city == ref.home:
+                        break
+                days_waiting = day - 1 - ref.last_day_refer
+                ref.days_away = days_out + days_waiting
+
+                if ref.seven_days_out > 0 and days_out == 8:
+                    ref.move_home(day)
+                    ref.seven_days_out += 1
+                elif ref.four_days_out > 0 and days_out > 4 and days_out <= 7:
+                    ref.move_home(day)
+                    ref.four_days_out += 1
+            '''
+            if ref.last_day_refer == day:
+                if len(ref.refgames) >= 2:
+                    penultimo = ref.refgames[-2]
+                    if not (ref.last_day_refer - penultimo.day <= 3):  # estaba en la casa y lo sacamos
+                        ref.resting = day - penultimo.day  # el resting es desde la ultima vez que estuvo en casa
+                else:
+                    ref.resting = day + 4  # el resting es desde el comienzo de la simulacion
+
             if ref.resting > 0:
                 ref.resting -= 1
-            if ref.resting == 0:
-                ref.undo_travelto()
-            if ref.current_city != ref.home:
+            if ref.days_away > 0:
                 ref.days_away -= 1
-        # remove if neccesary cost of 'flight_to_home_city'
 
     def pick_city(self, id, name):
         if name not in self.cities:
@@ -912,7 +980,26 @@ class Backtrack:
                     game.set_refs_types()  # cuando tenemos todos los refs, asignamos tipos
 
                     if num_game >= len(nba.games[day]):  # IF LAST GAME
+
+                        if day == 12:
+                            pp = pprint.PrettyPrinter(indent=4)
+                            pretty = {id: i.debug() for id, i in nba.referees.items()}
+                            with open("before.txt", "w") as f:
+                                f.write(pp.pformat(pretty))
                         self.nba.update_all_refs(day)
+                        if day == 12:
+                            pp = pprint.PrettyPrinter(indent=4)
+                            pretty = {id: i.debug() for id, i in nba.referees.items()}
+                            with open("after.txt", "w") as f:
+                                f.write(pp.pformat(pretty))
+
+                            nba.revert_all_refs(day)
+                            pp = pprint.PrettyPrinter(indent=4)
+                            pretty = {id: i.debug() for id, i in nba.referees.items()}
+                            with open("revert.txt", "w") as f:
+                                f.write(pp.pformat(pretty))
+                            exit(0)
+
                         if self.run(day + 1, 1):  # GO TO NEXT DAY
                             return True
                         print("revert refs")
