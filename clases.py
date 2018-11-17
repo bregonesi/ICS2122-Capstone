@@ -109,6 +109,9 @@ class Game:
         self.day = int(day)
         self.referees = []
 
+        self.principal = None
+        self.colaboradores = []
+
         self.channel = channel
         if self.channel:
             self.channel.add_game(self)
@@ -253,6 +256,43 @@ class Game:
 
         return True  # if neither of the if, return True
 
+    def set_refs_types(self):
+        for ref in self.referees:
+            if ref.type == "colaborador":
+                self.colaboradores.append(ref)
+            elif ref.type == "principal y colaborador":
+                # si no hay principal lo asigno de principal, sino colaborador
+                if not self.principal and ref.can_be_principal(self):
+                    self.principal = ref
+                else:
+                    self.colaboradores.append(ref)
+            elif ref.type == "principal":
+                # si ya se asigno un principal, entonces lo muevo a colaborador
+                if self.principal:
+                    if self.principal.type != "principal y colaborador":
+                        raise Exception("Esto no deberia pasar")
+
+                    self.colaboradores.append(self.principal)
+
+                if not ref.can_be_principal(self):
+                    raise Exception("No puede ser principal")
+
+                self.principal = ref
+
+        if not self.principal:
+            raise Exception("No se pudo escoger principal")
+
+    def ref_type(self, ref):
+        if ref not in self.referees:
+            raise Exception("{} not in referees list".format(ref))
+
+        if ref == self.principal:
+            return "principal"
+        elif ref in self.colaboradores:
+            return "colaborador"
+        else:
+            raise Exception("Error")
+
 
 class Referee:
     def __init__(self, id, type, city, income, aditional_income):
@@ -289,6 +329,23 @@ class Referee:
     @property
     def last_day_refer(self):
         return self.refgames[-1].day if self.refgames else 0
+
+    def can_be_principal(self, game):
+        if not self.refgames:
+            return True
+
+        compare_game = self.refgames[-1]
+        i = 1
+        while compare_game == game:
+            if len(self.refgames) <= i:  # si hay un solo juego no tengo con que comparar
+                return True
+            compare_game = self.refgames[-i]
+            i += 1
+        if compare_game:
+            if compare_game.day == game.day - 1:
+                if compare_game.ref_type(self) == "principal":
+                    return False
+        return True
 
     @property
     def max_days_away(self):
@@ -365,6 +422,10 @@ class Referee:
         if self.days_away > self.max_days_away:  # can't be more than 4 days outside
             #print("days away")
             return False
+
+        if self.type == "principal":
+            if not self.can_be_principal(game):
+                return False
 
         #if self.id == "76":
         #    print("Day: {}, away: {}, resting: {}, game_dec: {}".format(game.day, self.days_away, self.resting, game.can_assign_ref(self)))
@@ -840,6 +901,10 @@ class Backtrack:
 
         for ref in refs:
             if ref.is_valid(game):
+                if len(game.referees) == 0:  # lo primero que buscamos es un principal
+                    if not ("principal" in ref.type and ref.can_be_principal(game)):
+                        continue
+
                 if ref.refgames and ref.current_city != ref.home:
                     self.reused += 1
                     #print(game.day - ref.refgames[-1].day)
@@ -856,6 +921,8 @@ class Backtrack:
                     if self.run(day, num_game):  # STAY ON THIS DAY and GAME
                         return True
                 else:
+                    game.set_refs_types()  # cuando tenemos todos los refs, asignamos tipos
+
                     if num_game >= len(nba.games[day]):  # IF LAST GAME
                         self.nba.update_all_refs(day)
                         if self.run(day + 1, 1):  # GO TO NEXT DAY
@@ -969,12 +1036,13 @@ def export_refs_info_csv(nba):
 def create_history(nba):
     with open("resultados/history.csv", "w") as csvfile:
 
-        fieldnames = ['Ref ID'] + [i for i in range(1, 178)]
+        fieldnames = ['Ref ID', 'Type'] + [i for i in range(1, 178)]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
         for id, ref in nba.referees.items():
-            write = {"Ref ID": id}
+            write = {"Ref ID": id,
+                     "Type": ref.type}
 
             i_game = 0
             home = True
@@ -982,7 +1050,8 @@ def create_history(nba):
                 value = ""
                 if i_game < len(ref.refgames) and day == ref.refgames[i_game].day:
                     #value = "game"
-                    value = ref.refgames[i_game].home.city.city_name
+                    value = "{} - {}".format(ref.refgames[i_game].home.city.city_name,
+                                             ref.refgames[i_game].ref_type(ref))
                     i_game += 1
 
                 if i_game < len(ref.refgames):
