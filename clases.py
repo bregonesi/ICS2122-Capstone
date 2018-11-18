@@ -269,7 +269,8 @@ class Game:
             elif ref.type == "principal":
                 # si ya se asigno un principal, entonces lo muevo a colaborador
                 if self.principal:
-                    if self.principal.type != "principal y colaborador":
+                    # print(vars(self.principal))
+                    if "principal" not in self.principal.type:
                         raise Exception("Esto no deberia pasar")
 
                     self.colaboradores.append(self.principal)
@@ -471,11 +472,13 @@ class Referee:
 
         self.days_away = 0
 
-        last_game = self.refgames[-1]
-        last_game.add_cost(self, "flight_to_home_city", last_game.home.city.flights[self.home])
-        self.add_cost(last_game, "flight_to_home_city", last_game.home.city.flights[self.home])
+        if self.refgames:
+            last_game = self.refgames[-1]
+            last_game.add_cost(self, "flight_to_home_city", last_game.home.city.flights[self.home])
+            self.add_cost(last_game, "flight_to_home_city", last_game.home.city.flights[self.home])
 
     def undo_move_home(self, day):
+        global sum_days_away, count_days_away, count_one_days_away, count_fourplus_days_away, count_seven_days_away
         # print("undo id {}\n{}".format(self.id, vars(self)))
 
         i = 0
@@ -483,7 +486,12 @@ class Referee:
             if city == self.home:
                 break
             i += 1
-        days_working = self.refgames[-1].day - self.refgames[-i].day + 1
+
+        if len(self.refgames) > i:
+            days_working = self.refgames[-1].day - self.refgames[-i].day + 1
+        else:
+            days_working = i
+
         days_waiting = day - self.last_day_refer
         # print("days working {} | days waiting {}".format(days_working, days_waiting))
         self.days_away = days_working + days_waiting
@@ -994,7 +1002,8 @@ class Backtrack:
                             break
 
                     if not found:
-                        raise Exception("No se pudo encontrar un referee")
+                        # raise Exception("No se pudo encontrar un referee")
+                        return False
 
                     if rango_de_escoger_arbitros > 1.00:  # if heuristica
                         for i in range(game.i_valid_referees, len(game.valid_referees)):
@@ -1033,16 +1042,22 @@ class Backtrack:
         # print(self.next_referee_to_asign(day))
 
         refs = self.next_referee_to_asign(day)
+        if not refs:  # si falla -> backtrack
+            return False
         for game, ref, cost in refs:
             if len(game.referees) == 0:  # lo primero que buscamos es un principal
                 refs = self.next_referee_to_asign(day, principal=True)
+                if not refs:  # si falla -> backtrack
+                    return False
                 break
         # print(refs)
 
         for game, ref, cost in refs:
             if ref.is_valid(game):
+                i_reused = False
                 if ref.refgames and ref.current_city != ref.home:
                     reused += 1
+                    i_reused = True
                     # print(game.day - ref.refgames[-1].day)
 
                 better_before = ref.better_before(game)
@@ -1050,6 +1065,7 @@ class Backtrack:
                     pass
                     # print("mejor mandarlo antes")
 
+                old_i = game.i_valid_referees
                 if "principal" in ref.type and ref.can_be_principal(game):
                     game.i_valid_referees = 0
                 else:
@@ -1071,12 +1087,15 @@ class Backtrack:
                     if self.run(day + 1):  # GO TO NEXT DAY
                         return True
 
-                    self.nba.update_all_refs(day)
+                    self.nba.revert_all_refs(day)
                     # return False
 
                 assigned -= 1
-                # print("undo")
+                if i_reused:
+                    reused -= 1
+                game.i_valid_referees = old_i + 1
                 ref.undo_assign_game(game)
+                print("undo")
         return False
 
 
@@ -1222,7 +1241,7 @@ def days_out_stats(pprint=False):
              "Times one day out {}\n" \
              "Times four+ days out {}\n" \
              "Times seven days out {}\n".format(assigned, reused,
-                                                reused / assigned,
+                                                reused / assigned if assigned else "-",
                                                 sum_days_away / count_days_away,
                                                 count_days_away,
                                                 count_one_days_away,
