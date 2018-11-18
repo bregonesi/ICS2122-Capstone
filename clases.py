@@ -13,6 +13,7 @@ count_one_days_away = 0
 count_fourplus_days_away = 0
 count_seven_days_away = 0
 
+
 class City:
     def __init__(self, id, city):
         self.id = id
@@ -209,7 +210,7 @@ class Game:
         if self.channel and self.channel.name == "ESPN":  # this combination must have 3 referees
             colaboradores_limit = 2
 
-        #print("channel: {} | principales: {} | colaboradores: {}".format(self.channel and self.channel.name, principales, colaboradores))
+        # print("channel: {} | principales: {} | colaboradores: {}".format(self.channel and self.channel.name, principales, colaboradores))
 
         if principales > principales_limit:
             return False
@@ -294,8 +295,8 @@ class Referee:
         self.type = type.strip().lower()
 
         self.home = city
-        #self.prev_city = city  # hay q cambiar a timeline para poder retroceder mas de un dia
-        #self.city = city
+        # self.prev_city = city  # hay q cambiar a timeline para poder retroceder mas de un dia
+        # self.city = city
         self.home.add_referee(self)
 
         self.income = int(income)
@@ -389,40 +390,40 @@ class Referee:
 
     def is_valid(self, game):
         if self in game.referees:  # it's already on the game
-            #print("on game")
+            # print("on game")
             return False
 
         if self.last_day_refer > game.day:  # esto no deberia pasar, pero asi chequeamos que todo vaya bien
             raise Exception("There is an error. Last day refer {}, game day {}".format(self.last_day_refer, game.day))
 
         if self.last_day_refer == game.day:  # only can refer once a day
-            #print("one per day")
+            # print("one per day")
             return False
 
         if self.home == game.home.city:  # can't refer at home
-            #print("not at home")
+            # print("not at home")
             return False
 
         if self.home == game.away.city:  # can't refer home teams
             return False
 
         if self.current_city == self.home and self.resting <= 3:  # if at home, it must rest at least 3 days
-            #print("resting: {}".format(self.resting))
+            # print("resting: {}".format(self.resting))
             return False
 
         if self.days_away > self.max_days_away:  # can't be more than 4 days outside
-            #print("days away")
+            # print("days away")
             return False
 
         if self.type == "principal":
             if not self.can_be_principal(game):
                 return False
 
-        #if self.id == "76":
-        #    print("Day: {}, away: {}, resting: {}, game_dec: {}".format(game.day, self.days_away, self.resting, game.can_assign_ref(self)))
+        # if len(self.refgames) >= 40:  # analisis de sensibilidad
+        #    return False
 
         return game.can_assign_ref(self)
-        #return True
+        # return True
 
     def travel_to(self, to_city):
         if self.current_city != to_city:
@@ -469,7 +470,7 @@ class Referee:
         self.add_cost(last_game, "flight_to_home_city", last_game.home.city.flights[self.home])
 
     def undo_move_home(self, day):
-        #print("undo id {}\n{}".format(self.id, vars(self)))
+        # print("undo id {}\n{}".format(self.id, vars(self)))
 
         i = 0
         for city in list(reversed(self.timeline[:-1])):
@@ -478,7 +479,7 @@ class Referee:
             i += 1
         days_working = self.refgames[-1].day - self.refgames[-i].day + 1
         days_waiting = day - self.last_day_refer
-        #print("days working {} | days waiting {}".format(days_working, days_waiting))
+        # print("days working {} | days waiting {}".format(days_working, days_waiting))
         self.days_away = days_working + days_waiting
 
         if days_working >= 7:
@@ -574,19 +575,18 @@ class Referee:
         if self.current_city != self.home:
             old_flight_cost_to_home = self.current_city.flights[self.home]
 
-        costo_de_sacarlo_de_ciudad_mismo_dia = 0
+        '''costo_de_sacarlo_de_ciudad_mismo_dia = 0
         for nba_game in nba.games[game.day]:
             if game != nba_game and nba_game.home.city == self.current_city and game.home.city != nba_game.home.city and self.is_valid(nba_game):
                 costo_de_sacarlo_de_ciudad_mismo_dia += self.current_city.flights[game.home.city]
-                costo_de_sacarlo_de_ciudad_mismo_dia += game.home.city.flights[self.current_city]
+                costo_de_sacarlo_de_ciudad_mismo_dia += game.home.city.flights[self.current_city]'''
 
         total_cost = flight_cost_from + \
                      (hotel_cost_current + self.aditional_income) * days_waiting + \
                      (hotel_cost_game + self.aditional_income) * 1 + \
                      flight_cost_to_home - \
-                     old_flight_cost_to_home + \
-                     costo_de_sacarlo_de_ciudad_mismo_dia
-
+                     old_flight_cost_to_home  # + \
+        # costo_de_sacarlo_de_ciudad_mismo_dia
 
         return total_cost
 
@@ -604,6 +604,7 @@ class Referee:
                 "home": self.home.city,
                 "refgames": [[i.day, i.home.city.city] for i in self.refgames],
                 "timeline": [i.city for i in self.timeline]}
+
 
 class NBA:
     def __init__(self):
@@ -844,9 +845,6 @@ class NBA:
             game.valid_referees = self.order_costs(game)
 
 
-
-
-
 def export():
     csvfile = "datos/timeline.csv"
     refs = [r for r in nba.referees.values()]
@@ -863,6 +861,7 @@ def export():
     with open(csvfile, "w") as output:
         writer = csv.writer(output, lineterminator='\n')
         writer.writerows(data)
+
 
 class Backtrack:
     def __init__(self, nba):
@@ -972,6 +971,7 @@ class Backtrack:
         result = []  # [game, referee, cost]
         for game in games_day:
             found = False
+            original = None
             if not game.has_all_refs():
                 if not principal or (principal and len(game.referees) == 0):  # si buscamos un principal
                     for i in range(game.i_valid_referees, len(game.valid_referees)):
@@ -980,21 +980,35 @@ class Backtrack:
                             if principal and not ("principal" in referee.type and referee.can_be_principal(game)):
                                 continue  # saltamos hasta encontrar principal
                             result.append([game, referee, cost])
+                            original = [game, referee, cost]
                             game.i_valid_referees = i
                             found = True
                             break
 
                     if not found:
                         raise Exception("No se pudo encontrar un referee")
+
+                    if False:  # if heuristica
+                        for i in range(game.i_valid_referees, len(game.valid_referees)):
+                            referee, cost = game.valid_referees[i]
+                            if cost > original[2] * 1.05:  # 5% mas
+                                break
+                            if referee.is_valid(game) and len(referee.refgames) == 0:
+                                if principal and not ("principal" in referee.type and referee.can_be_principal(game)):
+                                    continue  # saltamos hasta encontrar principal
+                                result.remove(original)
+                                result.append([game, referee, cost])
+                                game.i_valid_referees = i
+                                break
+
         result.sort(key=lambda x: x[2], reverse=False)
         return result
 
-
     def run(self, day):
-        #print("day {}".format(day))
+        # print("day {}".format(day))
         if day >= 178:  # 178: END CONDITION
-            print(self.reused)
-            print(self.assigned)
+            print("Asigned: {}; Resued {}".format(self.assigned, self.reused))
+            print("Ratio reused: {}".format(self.reused / self.assigned))
 
             for ref in nba.referees.values():
                 if ref.current_city != ref.home:
@@ -1010,26 +1024,25 @@ class Backtrack:
         if not self.nba.valid_refs_per_game_done(day):
             self.nba.update_valid_refs_per_game(day)
 
-        #game = self.nba.games[day][num_game - 1]
-        #print(self.next_referee_to_asign(day))
+        # print(self.next_referee_to_asign(day))
 
         refs = self.next_referee_to_asign(day)
         for game, ref, cost in refs:
             if len(game.referees) == 0:  # lo primero que buscamos es un principal
                 refs = self.next_referee_to_asign(day, principal=True)
                 break
-        #print(refs)
+        # print(refs)
 
         for game, ref, cost in refs:
             if ref.is_valid(game):
                 if ref.refgames and ref.current_city != ref.home:
                     self.reused += 1
-                    #print(game.day - ref.refgames[-1].day)
+                    # print(game.day - ref.refgames[-1].day)
 
                 better_before = ref.better_before(game)
                 if better_before:
                     pass
-                    #print("mejor mandarlo antes")
+                    # print("mejor mandarlo antes")
 
                 if "principal" in ref.type and ref.can_be_principal(game):
                     game.i_valid_referees = 0
@@ -1037,7 +1050,7 @@ class Backtrack:
                     game.i_valid_referees += 1
 
                 ref.assign_game(game)  # IF VALID: ASSIGN
-                #print("assigned")
+                # print("assigned")
                 self.assigned += 1
 
                 if not self.day_valid(day):
@@ -1047,30 +1060,26 @@ class Backtrack:
                     for nba_game in self.nba.games[day]:
                         nba_game.set_refs_types()  # cuando tenemos todos los refs, asignamos tipos
 
-                    #if num_game >= len(nba.games[day]):  # IF LAST GAME
-
                     self.nba.update_all_refs(day)
 
                     if self.run(day + 1):  # GO TO NEXT DAY
                         return True
 
                     self.nba.update_all_refs(day)
-                    #return False
-                    '''else:
-                        if self.run(day, num_game + 1):  # GO TO NEXT GAME
-                            return True'''
+                    # return False
 
                 self.assigned -= 1
-                #print("undo")
+                # print("undo")
                 ref.undo_assign_game(game)
         return False
+
 
 def export_game_days(nba):
     season_total_cost = 0
     with open("resultados/games-days.txt", "w") as day_games:
         for i in range(1, 178):
             if i in nba.games:
-                day_str = "{0} DAY {1} {0}\n".format("-"*15, i)
+                day_str = "{0} DAY {1} {0}\n".format("-" * 15, i)
                 print(day_str, end="")
                 day_games.write(day_str)
 
@@ -1081,7 +1090,8 @@ def export_game_days(nba):
                     refs = [r.id for r in game.referees]
 
                     string = "Game {}: {}; Channel: {}; Valid refs: {}, Total cost: {}, Costs:\n" \
-                             "{}\n\n".format(g + 1, refs, game.channel and game.channel.name, game.valid_referees, game.total_cost, game.costs_pretty)
+                             "{}\n\n".format(g + 1, refs, game.channel and game.channel.name, game.valid_referees,
+                                             game.total_cost, game.costs_pretty)
                     season_total_cost += game.total_cost
 
                     print(string, end="")
@@ -1090,6 +1100,7 @@ def export_game_days(nba):
         string = "Season total cost: {}\n".format(season_total_cost)
         print(string, end="")
         day_games.write(string)
+
 
 def export_game_days_csv(nba):
     with open("resultados/games-days-csv.csv", "w") as csvfile:
@@ -1108,8 +1119,9 @@ def export_game_days_csv(nba):
                              "Channel": game.channel and game.channel.name,
                              "#Valid refs": game.valid_referees,
                              "Total cost": game.total_cost}
-                    #print(write)
+                    # print(write)
                     writer.writerow(write)
+
 
 def export_refs_info(nba):
     refs = [r for r in nba.referees.values()]
@@ -1139,11 +1151,11 @@ def export_refs_info(nba):
         print(string, end="")
         refs_info.write(string)
 
+
 def export_refs_info_csv(nba):
     refs = [r for r in nba.referees.values()]
     refs.sort(key=lambda x: len(set(x.timeline)), reverse=False)
     with open("resultados/refs-info-csv.csv", "w") as csvfile:
-
         fieldnames = ['Ref ID', 'Home', 'Aditional Income', '#Cities', '#Games', 'Avg cost', 'Total cost']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
@@ -1175,7 +1187,7 @@ def create_history(nba):
             for day in range(1, 178):
                 value = ""
                 if i_game < len(ref.refgames) and day == ref.refgames[i_game].day:
-                    #value = "game"
+                    # value = "game"
                     value = "{} - {}".format(ref.refgames[i_game].home.city.city_name,
                                              ref.refgames[i_game].ref_type(ref))
                     i_game += 1
@@ -1189,6 +1201,7 @@ def create_history(nba):
 
             writer.writerow(write)
 
+
 def days_out_stats():
     global sum_days_away, count_days_away, count_one_days_away, count_fourplus_days_away, count_seven_days_away
     string = "Stats\n" \
@@ -1196,10 +1209,10 @@ def days_out_stats():
              "Times one day out {}\n" \
              "Times four+ days out {}\n" \
              "Times seven days out {}\n".format(sum_days_away / count_days_away,
-                                              count_days_away,
-                                              count_one_days_away,
-                                              count_fourplus_days_away,
-                                              count_seven_days_away)
+                                                count_days_away,
+                                                count_one_days_away,
+                                                count_fourplus_days_away,
+                                                count_seven_days_away)
     with open("resultados/stats.txt", "w") as file:
         file.write(string)
         print(string)
@@ -1217,16 +1230,15 @@ if __name__ == "__main__":
     print("Seeds terminado")
 
     bk = Backtrack(nba)
-    #bk.game_options(2, 2, limit=30)
+    # bk.game_options(2, 2, limit=30)
 
-    #pp = pprint.PrettyPrinter(indent=4)
-    #print(pp.pformat(bk.list_game_options))
+    # pp = pprint.PrettyPrinter(indent=4)
+    # print(pp.pformat(bk.list_game_options))
     bk.run(1)
 
-    #export_game_days(nba)
-    #export_game_days_csv(nba)
-    #export_refs_info(nba)
-    #export_refs_info_csv(nba)
+    # export_game_days(nba)
+    # export_game_days_csv(nba)
+    export_refs_info(nba)
+    export_refs_info_csv(nba)
     create_history(nba)
-    #days_out_stats()
-
+    # days_out_stats()
