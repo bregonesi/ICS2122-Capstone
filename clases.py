@@ -12,6 +12,11 @@ count_days_away = 0
 count_one_days_away = 0
 count_fourplus_days_away = 0
 count_seven_days_away = 0
+assigned = 0
+reused = 0
+
+maximo_de_partidos = None
+rango_de_escoger_arbitros = 1.00
 
 
 class City:
@@ -389,6 +394,7 @@ class Referee:
             del self.costs[producer_key]
 
     def is_valid(self, game):
+        global maximo_de_partidos
         if self in game.referees:  # it's already on the game
             # print("on game")
             return False
@@ -419,8 +425,8 @@ class Referee:
             if not self.can_be_principal(game):
                 return False
 
-        # if len(self.refgames) >= 40:  # analisis de sensibilidad
-        #    return False
+        if maximo_de_partidos and len(self.refgames) >= maximo_de_partidos:  # analisis de sensibilidad
+            return False
 
         return game.can_assign_ref(self)
         # return True
@@ -484,8 +490,12 @@ class Referee:
 
         if days_working >= 7:
             self.seven_days_out += 1
+            count_seven_days_away -= 1
         if days_working >= 4:
             self.four_days_out += 1
+            count_fourplus_days_away -= 1
+        if days_working == 1:
+            count_one_days_away -= 1
 
         self.resting = 0
 
@@ -867,8 +877,6 @@ class Backtrack:
     def __init__(self, nba):
         self.nba = nba
         self.list_game_options = {}  # dict with {game: [options]}
-        self.assigned = 0
-        self.reused = 0
 
     def day_valid(self, day):
         for game in self.nba.games[day]:
@@ -988,10 +996,10 @@ class Backtrack:
                     if not found:
                         raise Exception("No se pudo encontrar un referee")
 
-                    if False:  # if heuristica
+                    if rango_de_escoger_arbitros > 1.00:  # if heuristica
                         for i in range(game.i_valid_referees, len(game.valid_referees)):
                             referee, cost = game.valid_referees[i]
-                            if cost > original[2] * 1.05:  # 5% mas
+                            if cost > original[2] * rango_de_escoger_arbitros:  # rango_de_escoger_arbitros% mas
                                 break
                             if referee.is_valid(game) and len(referee.refgames) == 0:
                                 if principal and not ("principal" in referee.type and referee.can_be_principal(game)):
@@ -1005,11 +1013,9 @@ class Backtrack:
         return result
 
     def run(self, day):
+        global assigned, reused
         # print("day {}".format(day))
         if day >= 178:  # 178: END CONDITION
-            print("Asigned: {}; Resued {}".format(self.assigned, self.reused))
-            print("Ratio reused: {}".format(self.reused / self.assigned))
-
             for ref in nba.referees.values():
                 if ref.current_city != ref.home:
                     ref.days_away += 1  # for stats
@@ -1036,7 +1042,7 @@ class Backtrack:
         for game, ref, cost in refs:
             if ref.is_valid(game):
                 if ref.refgames and ref.current_city != ref.home:
-                    self.reused += 1
+                    reused += 1
                     # print(game.day - ref.refgames[-1].day)
 
                 better_before = ref.better_before(game)
@@ -1051,7 +1057,7 @@ class Backtrack:
 
                 ref.assign_game(game)  # IF VALID: ASSIGN
                 # print("assigned")
-                self.assigned += 1
+                assigned += 1
 
                 if not self.day_valid(day):
                     if self.run(day):  # STAY ON THIS DAY and GAME
@@ -1068,19 +1074,20 @@ class Backtrack:
                     self.nba.update_all_refs(day)
                     # return False
 
-                self.assigned -= 1
+                assigned -= 1
                 # print("undo")
                 ref.undo_assign_game(game)
         return False
 
 
-def export_game_days(nba):
+def export_game_days(nba, pprint=False):
     season_total_cost = 0
     with open("resultados/games-days.txt", "w") as day_games:
         for i in range(1, 178):
             if i in nba.games:
                 day_str = "{0} DAY {1} {0}\n".format("-" * 15, i)
-                print(day_str, end="")
+                if pprint:
+                    print(day_str, end="")
                 day_games.write(day_str)
 
                 for g, game in enumerate(nba.games[i]):
@@ -1094,11 +1101,13 @@ def export_game_days(nba):
                                              game.total_cost, game.costs_pretty)
                     season_total_cost += game.total_cost
 
-                    print(string, end="")
+                    if pprint:
+                        print(string, end="")
                     day_games.write(string)
 
         string = "Season total cost: {}\n".format(season_total_cost)
-        print(string, end="")
+        if pprint:
+            print(string, end="")
         day_games.write(string)
 
 
@@ -1123,7 +1132,7 @@ def export_game_days_csv(nba):
                     writer.writerow(write)
 
 
-def export_refs_info(nba):
+def export_refs_info(nba, pprint=False):
     refs = [r for r in nba.referees.values()]
     refs.sort(key=lambda x: len(set(x.timeline)), reverse=False)
     season_total_cost = 0
@@ -1144,11 +1153,13 @@ def export_refs_info(nba):
                                                    ref.total_cost / len(ref.refgames) if ref.refgames else "-",
                                                    len(set(ref.refgames)))
             season_total_cost += ref.total_cost
-            print(string, end="")
+            if pprint:
+                print(string, end="")
             refs_info.write(string)
 
         string = "Season total cost: {}\n".format(season_total_cost)
-        print(string, end="")
+        if pprint:
+            print(string, end="")
         refs_info.write(string)
 
 
@@ -1202,20 +1213,25 @@ def create_history(nba):
             writer.writerow(write)
 
 
-def days_out_stats():
-    global sum_days_away, count_days_away, count_one_days_away, count_fourplus_days_away, count_seven_days_away
-    string = "Stats\n" \
+def days_out_stats(pprint=False):
+    global asigned, reused, sum_days_away, count_days_away, count_one_days_away, count_fourplus_days_away, count_seven_days_away
+    string = "--- Stats ---\n" \
+             "Asigned: {}; Resued {}\n" \
+             "Ratio reused: {}\n" \
              "Avg days out {}\n" \
              "Times one day out {}\n" \
              "Times four+ days out {}\n" \
-             "Times seven days out {}\n".format(sum_days_away / count_days_away,
+             "Times seven days out {}\n".format(assigned, reused,
+                                                reused / assigned,
+                                                sum_days_away / count_days_away,
                                                 count_days_away,
                                                 count_one_days_away,
                                                 count_fourplus_days_away,
                                                 count_seven_days_away)
     with open("resultados/stats.txt", "w") as file:
         file.write(string)
-        print(string)
+        if pprint:
+            print(string)
 
 
 if __name__ == "__main__":
@@ -1234,11 +1250,18 @@ if __name__ == "__main__":
 
     # pp = pprint.PrettyPrinter(indent=4)
     # print(pp.pformat(bk.list_game_options))
+
+    # maximo_de_partidos = 40
+    # rango_de_escoger_arbitros = 1.05
+
     bk.run(1)
 
-    # export_game_days(nba)
-    # export_game_days_csv(nba)
+    export_game_days(nba)
+    # export_game_days(nba, pprint=True)
+    export_game_days_csv(nba)
     export_refs_info(nba)
+    # export_refs_info(nba, pprint=True)
     export_refs_info_csv(nba)
     create_history(nba)
-    # days_out_stats()
+    days_out_stats()
+    # days_out_stats(pprint=True)
