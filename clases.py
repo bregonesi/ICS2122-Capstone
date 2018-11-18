@@ -1275,12 +1275,17 @@ if __name__ == "__main__":
 
     bk.run(1)
 
+    # Exportar resultados
     export_game_days(nba)
     # export_game_days(nba, pprint=True)
+
     export_game_days_csv(nba)
+
     export_refs_info(nba)
     # export_refs_info(nba, pprint=True)
+
     export_refs_info_csv(nba)
     create_history(nba)
+
     days_out_stats()
     # days_out_stats(pprint=True)
