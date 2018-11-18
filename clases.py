@@ -118,6 +118,7 @@ class Game:
 
         self.costs = {}
         self.valid_referees = None
+        self.i_valid_referees = 0  # el i que recorre la lista anterior
 
     @property
     def total_cost(self):
@@ -159,13 +160,6 @@ class Game:
 
         if not self.costs[producer_key]:
             del self.costs[producer_key]
-
-    def set_valid_referees(self, referee_list):
-        c = 0
-        for ref in referee_list:
-            if ref.is_valid(self):
-                c += 1
-        self.valid_referees = c
 
     def assign_ref(self, ref):
         if self.has_all_refs():
@@ -310,9 +304,6 @@ class Referee:
         self.resting = 4
         self.days_away = 0
 
-        self.moved_today = False
-        self.moved_yesterday = False
-        #self.refdays = []
         self.refgames = []
 
         self.timeline = [self.home]  # cities where it've been
@@ -823,8 +814,8 @@ class NBA:
                 self.referees[code] = referee
 
     def order_costs(self, game):
-        refs = [r for r in self.referees.values()]
-        refs.sort(key=lambda x: x.cost_to_game(game, self), reverse=False)
+        refs = [[r, r.cost_to_game(game, self)] for r in self.referees.values()]
+        refs.sort(key=lambda x: x[1], reverse=False)
         return refs
 
     def make_timeline(self):
@@ -838,6 +829,20 @@ class NBA:
                             break
                 else:
                     r.timeline.append("-")
+
+    def valid_refs_per_game_done(self, day):
+        for game in self.games[day]:
+            if not game.valid_referees:
+                return False
+        return True
+
+    def update_valid_refs_per_game(self, day):
+        for game in self.games[day]:
+            if game.referees:
+                raise Exception("Error. Esto hay que hacerlo cuando no hay ningun referee asignado")
+
+            game.valid_referees = self.order_costs(game)
+
 
 
 
@@ -962,8 +967,31 @@ class Backtrack:
             print("No more options")
         return False
 
-    def run(self, day, num_game):
-        #print("day {}, numgame {}".format(day, num_game))
+    def next_referee_to_asign(self, day, principal=False):
+        games_day = self.nba.games[day]
+        result = []  # [game, referee, cost]
+        for game in games_day:
+            found = False
+            if not game.has_all_refs():
+                if not principal or (principal and len(game.referees) == 0):  # si buscamos un principal
+                    for i in range(game.i_valid_referees, len(game.valid_referees)):
+                        referee, cost = game.valid_referees[i]
+                        if referee.is_valid(game):
+                            if principal and not ("principal" in referee.type and referee.can_be_principal(game)):
+                                continue  # saltamos hasta encontrar principal
+                            result.append([game, referee, cost])
+                            game.i_valid_referees = i
+                            found = True
+                            break
+
+                    if not found:
+                        raise Exception("No se pudo encontrar un referee")
+        result.sort(key=lambda x: x[2], reverse=False)
+        return result
+
+
+    def run(self, day):
+        #print("day {}".format(day))
         if day >= 178:  # 178: END CONDITION
             print(self.reused)
             print(self.assigned)
@@ -977,20 +1005,23 @@ class Backtrack:
 
         if day not in nba.games:  # SOME DAYS DON'T HAVE GAMES
             self.nba.update_all_refs(day)
-            return self.run(day + 1, 1)
+            return self.run(day + 1)
 
-        game = self.nba.games[day][num_game - 1]
-        refs = self.nba.order_costs(game)
+        if not self.nba.valid_refs_per_game_done(day):
+            self.nba.update_valid_refs_per_game(day)
 
-        if game.valid_referees == None:
-            game.set_valid_referees(refs)
+        #game = self.nba.games[day][num_game - 1]
+        #print(self.next_referee_to_asign(day))
 
-        for ref in refs:
+        refs = self.next_referee_to_asign(day)
+        for game, ref, cost in refs:
+            if len(game.referees) == 0:  # lo primero que buscamos es un principal
+                refs = self.next_referee_to_asign(day, principal=True)
+                break
+        #print(refs)
+
+        for game, ref, cost in refs:
             if ref.is_valid(game):
-                if len(game.referees) == 0:  # lo primero que buscamos es un principal
-                    if not ("principal" in ref.type and ref.can_be_principal(game)):
-                        continue
-
                 if ref.refgames and ref.current_city != ref.home:
                     self.reused += 1
                     #print(game.day - ref.refgames[-1].day)
@@ -1000,27 +1031,34 @@ class Backtrack:
                     pass
                     #print("mejor mandarlo antes")
 
+                if "principal" in ref.type and ref.can_be_principal(game):
+                    game.i_valid_referees = 0
+                else:
+                    game.i_valid_referees += 1
+
                 ref.assign_game(game)  # IF VALID: ASSIGN
+                #print("assigned")
                 self.assigned += 1
 
-                if not game.has_all_refs():
-                    if self.run(day, num_game):  # STAY ON THIS DAY and GAME
+                if not self.day_valid(day):
+                    if self.run(day):  # STAY ON THIS DAY and GAME
                         return True
                 else:
-                    game.set_refs_types()  # cuando tenemos todos los refs, asignamos tipos
+                    for nba_game in self.nba.games[day]:
+                        nba_game.set_refs_types()  # cuando tenemos todos los refs, asignamos tipos
 
-                    if num_game >= len(nba.games[day]):  # IF LAST GAME
+                    #if num_game >= len(nba.games[day]):  # IF LAST GAME
 
-                        self.nba.update_all_refs(day)
+                    self.nba.update_all_refs(day)
 
-                        if self.run(day + 1, 1):  # GO TO NEXT DAY
-                            return True
+                    if self.run(day + 1):  # GO TO NEXT DAY
+                        return True
 
-                        self.nba.update_all_refs(day)
-                        #return False
-                    else:
+                    self.nba.update_all_refs(day)
+                    #return False
+                    '''else:
                         if self.run(day, num_game + 1):  # GO TO NEXT GAME
-                            return True
+                            return True'''
 
                 self.assigned -= 1
                 #print("undo")
@@ -1070,7 +1108,7 @@ def export_game_days_csv(nba):
                              "Channel": game.channel and game.channel.name,
                              "#Valid refs": game.valid_referees,
                              "Total cost": game.total_cost}
-                    print(write)
+                    #print(write)
                     writer.writerow(write)
 
 def export_refs_info(nba):
@@ -1183,12 +1221,12 @@ if __name__ == "__main__":
 
     #pp = pprint.PrettyPrinter(indent=4)
     #print(pp.pformat(bk.list_game_options))
-    bk.run(1, 1)
+    bk.run(1)
 
-    export_game_days(nba)
-    export_game_days_csv(nba)
-    export_refs_info(nba)
-    export_refs_info_csv(nba)
+    #export_game_days(nba)
+    #export_game_days_csv(nba)
+    #export_refs_info(nba)
+    #export_refs_info_csv(nba)
     create_history(nba)
-    days_out_stats()
+    #days_out_stats()
 
